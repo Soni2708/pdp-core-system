@@ -19,9 +19,13 @@ require_auth(module_name="pdp", secret_dict_name="users_pdp")
 semua_data = fetch_mapped_data()
 waktu_sekarang = get_waktu_wib()
 
-if not semua_data:
+if semua_data is None:
+    # Ini baru error sungguhan (misal internet putus)
     st.error("Koneksi Database Terputus atau Sedang Sibuk.")
     st.stop()
+elif not semua_data:
+    # Ini kalau databasenya nyala, tapi emang lagi nggak ada armada (kosong)
+    semua_data = [] 
 
 data_kanban = proses_kanban_pdp(semua_data, waktu_sekarang)
 
