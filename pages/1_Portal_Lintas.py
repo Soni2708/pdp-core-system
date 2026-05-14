@@ -28,7 +28,7 @@ require_auth(module_name="portal", secret_dict_name="users_portal")
 with st.sidebar:
     st.markdown(f"<h3 style='color:#00d2d3;'>👤 {st.session_state.get('petugas_portal', 'Petugas').upper()}</h3>", unsafe_allow_html=True)
     st.markdown('<div class="btn-logout">', unsafe_allow_html=True)
-    if st.button("🚪 LOGOUT PORTAL", use_container_width=True):
+    if st.button("Logout", use_container_width=True):
         logout_user("portal")
     st.markdown('</div>', unsafe_allow_html=True)
 
