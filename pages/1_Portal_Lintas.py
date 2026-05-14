@@ -8,13 +8,29 @@ from db_utils import safe_append_reguler, get_waktu_wib
 # IMPORT SERVICES BARU
 from services.jadwal_service import get_semua_rute, get_jadwal_dinamis
 
-# INJEKSI LOGGER
+# INJEKSI LOGGER (BLACKBOX)
 from core.logger import setup_logger
 log = setup_logger("PORTAL_AWAL")
+
+# INJEKSI SISTEM KEAMANAN (BARU)
+from core.auth import require_auth, logout_user
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(page_title="PORTAL LINTAS", page_icon="🚐", layout="centered")
 apply_global_cyberpunk_theme()
+
+# ============================================================
+# 🛡️ PASANG GEMBOK KEAMANAN DI SINI
+# ============================================================
+require_auth(module_name="portal", secret_dict_name="users_portal")
+
+# Tombol Logout diletakkan di Sidebar agar UI tengah tetap rapi
+with st.sidebar:
+    st.markdown(f"<h3 style='color:#00d2d3;'>👤 {st.session_state.get('petugas_portal', 'Petugas').upper()}</h3>", unsafe_allow_html=True)
+    st.markdown('<div class="btn-logout">', unsafe_allow_html=True)
+    if st.button("🚪 LOGOUT PORTAL", use_container_width=True):
+        logout_user("portal")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- RENDER LOGO & HEADER ---
 col1, col2, col3 = st.columns([2, 0.8, 2])
@@ -113,9 +129,11 @@ if st.button("TRANSMIT DATA KE SISTEM PDP", disabled=tombol_terkunci):
         
         sukses, pesan = safe_append_reguler(data_baru)
         
+        petugas_sekarang = st.session_state.get('petugas_portal', 'Unknown')
+        
         if sukses:
             # ✅ LOGGING SUKSES
-            log.info(f"TRANSMIT SUKSES: Driver {nama_driver} ({nopol_reguler.strip()}) rute {pilihan_rute} berangkat jam {jadwal_final}.")
+            log.info(f"TRANSMIT SUKSES: Petugas {petugas_sekarang} mendaftarkan Driver {nama_driver} ({nopol_reguler.strip()}) rute {pilihan_rute} jadwal {jadwal_final}.")
             
             st.cache_data.clear()
             st.session_state.pesan_sukses = f"✅ TRANSMISI SUKSES! Armada {nopol_reguler.strip()} berangkat jam {jadwal_final}."
@@ -123,5 +141,5 @@ if st.button("TRANSMIT DATA KE SISTEM PDP", disabled=tombol_terkunci):
             st.rerun()
         else:
             # ❌ LOGGING ERROR
-            log.error(f"TRANSMIT GAGAL: Driver {nama_driver} ({nopol_reguler.strip()}). Alasan: {pesan}")
+            log.error(f"TRANSMIT GAGAL: Petugas {petugas_sekarang} gagal mendaftarkan {nopol_reguler.strip()}. Alasan: {pesan}")
             st.error(f"⛔ Transmisi Gagal: {pesan}")
