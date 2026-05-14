@@ -160,18 +160,19 @@ with col_kanan:
     """, unsafe_allow_html=True)
     
     for unit in monitor_antrean:
-    st.markdown(f"""
-    <div style="line-height: 1.4; text-align: left; padding: 12px; background-color:#161b22; border-radius:6px; border: 1px solid #30363d; border-top: 3px solid #00d2d3; overflow: hidden; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
-            <span>
-                <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['label']}</span>
-                <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;"> [ {unit['driver']} ]</span>
-            </span>
-            <span style="font-size: 12px; color: #feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">🕒 TIBA: {unit['tiba']}</span>
+        st.markdown(f"""
+        <div style="line-height: 1.4; text-align: left; padding: 12px; background-color:#161b22; border-radius:6px; border: 1px solid #30363d; border-left: 3px solid #00d2d3; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
+                <span>
+                    <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['label']}</span>
+                    <!-- UKURAN FONT DRIVER DINAIIKAN KE 15px -->
+                    <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;"> [ {unit['driver']} ]</span>
+                </span>
+                <span style="font-size: 12px; color: #feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">🕒 TIBA: {unit['tiba']}</span>
+            </div>
+            <ul style="margin: 4px 0 0 0; padding-left: 20px; font-size: 13px; color: #e2e8f0; list-style-type: square;">{unit['html']}</ul>
         </div>
-        <ul style="margin: 4px 0 0 0; padding-left: 20px; font-size: 13px; color: #e2e8f0; list-style-type: square;">{unit['html']}</ul>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     st.markdown("<h4 style='color:#00d2d3; font-size:14px; margin: 25px 0 15px 0; border-bottom: 1px solid #30363d; padding-bottom: 5px; font-family:\"Rajdhani\", sans-serif; letter-spacing:1px;'>🚦 KEBERANGKATAN FEEDER 🚦</h4>", unsafe_allow_html=True)
     
