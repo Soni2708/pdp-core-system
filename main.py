@@ -3,7 +3,7 @@ import streamlit as st
 from components.ui_styles import apply_global_cyberpunk_theme, render_cyberpunk_header
 
 # Konfigurasi Paling Awal
-st.set_page_config(page_title="LINTAS COMMAND CENTER", page_icon="📡", layout="centered")
+st.set_page_config(page_title="PDP Mobility Dashboard", page_icon="📡", layout="centered")
 
 # Panggil fungsi CSS global
 apply_global_cyberpunk_theme()
@@ -17,7 +17,7 @@ with col2:
     except FileNotFoundError:
         st.warning("Logo tidak ditemukan di assets/logo.png")
 
-render_cyberpunk_header("COMMAND CENTER", "LINTAS Sistem Operasi Terpadu", "#ff0055")
+render_cyberpunk_header("TRANSIT HUB CORE SYSTEM", "PDP Mobility Dashboard - By : Soni Abbasy", "#ff0055")
 
 st.divider()
 st.info("👈 Silakan pilih modul operasional di menu *sidebar* sebelah kiri untuk memulai.")
