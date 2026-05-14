@@ -28,13 +28,16 @@ def require_auth(module_name, secret_dict_name):
         col_log1, col_log2, col_log3 = st.columns([1, 1.5, 1])
         with col_log2:
             with st.form(f"form_login_{module_name}"):
-                input_id = st.text_input("User ID").upper().strip()
+                # FIX: Input diubah ke .lower() agar kebal terhadap kesalahan huruf besar/kecil
+                input_id = st.text_input("User ID").lower().strip()
                 input_pass = st.text_input("Password", type="password").strip()
                 submit_login = st.form_submit_button("MASUK / AUTHENTICATE")
                 
                 if submit_login:
                     try:
-                        user_db = st.secrets[secret_dict_name]
+                        # FIX: Otomatis mapping semua kunci di database menjadi lowercase
+                        user_db_raw = st.secrets[secret_dict_name]
+                        user_db = {str(k).lower(): str(v) for k, v in user_db_raw.items()}
                     except KeyError:
                         st.error(f"Fatal Error: Database kredensial [{secret_dict_name}] hilang dari sistem!")
                         st.stop()
