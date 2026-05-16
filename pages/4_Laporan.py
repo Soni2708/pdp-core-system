@@ -8,6 +8,27 @@ st.set_page_config(page_title="Laporan Manajemen", page_icon="📊", layout="cen
 apply_global_cyberpunk_theme()
 require_auth(module_name="admin", secret_dict_name="users_admin")
 
+import streamlit as st
+from components.ui_styles import apply_global_cyberpunk_theme
+from core.auth import require_auth
+from db_utils import generate_excel_report, get_waktu_wib
+from datetime import datetime, timedelta
+
+st.set_page_config(page_title="Laporan Manajemen", page_icon="📊", layout="centered")
+apply_global_cyberpunk_theme()
+require_auth(module_name="admin", secret_dict_name="users_admin")
+
+# ==========================================
+# 🚪 TOMBOL LOGOUT DI SIDEBAR
+# ==========================================
+with st.sidebar:
+    st.divider() # Bikin garis pemisah biar rapi
+    if st.button("Logout", type="primary", use_container_width=True):
+        # Hapus semua memori sesi login saat ini
+        st.session_state.clear()
+        # Refresh halaman paksa biar langsung ke-gembok lagi
+        st.rerun()
+
 st.markdown("<h2 style='color:#00d2d3; text-align:center;'>📊 EXPORT DATA OPERASIONAL</h2>", unsafe_allow_html=True)
 st.divider()
 
