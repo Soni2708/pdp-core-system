@@ -146,15 +146,15 @@ with col_kanan:
     <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 15px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
             <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">MIM / BUAHBATU</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #00d2d3; font-size: 25px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
             <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">KOPO</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #00d2d3; font-size: 25px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%;">
             <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">JATINANGOR</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #00d2d3; font-size: 25px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
