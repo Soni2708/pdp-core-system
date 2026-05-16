@@ -12,7 +12,7 @@ from services.engine_kalkulasi import hitung_wt
 from core.logger import setup_logger
 log = setup_logger("SYSTEM_PDP")
 
-st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="wide")
+st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="centered")
 apply_global_cyberpunk_theme()
 require_auth(module_name="pdp", secret_dict_name="users_pdp") 
 
@@ -20,11 +20,9 @@ semua_data = fetch_mapped_data()
 waktu_sekarang = get_waktu_wib()
 
 if semua_data is None:
-    # Ini baru error sungguhan (misal internet putus)
     st.error("Koneksi Database Terputus atau Sedang Sibuk.")
     st.stop()
 elif not semua_data:
-    # Ini kalau databasenya nyala, tapi emang lagi nggak ada armada (kosong)
     semua_data = [] 
 
 data_kanban = proses_kanban_pdp(semua_data, waktu_sekarang)
@@ -140,7 +138,6 @@ with col_tengah:
 with col_kanan:
     st.markdown("<div style='background-color:#161b22; border:1px solid #30363d; border-top:3px solid #00d2d3; border-radius:6px; padding:10px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0, 210, 211, 0.1);'><h4 style='color:#00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.4); font-size:15px; margin:0; text-align:center; font-family:\"Rajdhani\", sans-serif; letter-spacing:2px;'>📍 WAKTU TUNGGU PDP</h4></div>", unsafe_allow_html=True)
     
-    # 1. TULISAN RUTE SUDAH DIPERKECIL
     st.markdown(f"""
     <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 12px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
@@ -158,7 +155,6 @@ with col_kanan:
     </div>
     """, unsafe_allow_html=True)
     
-    # 2. DAFTAR ANTREAN SUDAH JADI KOTAK SCROLLABLE
     html_antrean = "<div style='max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;'>"
     for unit in monitor_antrean:
         html_antrean += f"""
@@ -175,8 +171,7 @@ with col_kanan:
         """
     html_antrean += "</div>"
     
-    if monitor_antrean:
-        st.markdown(html_antrean, unsafe_allow_html=True)
+    st.markdown(html_antrean, unsafe_allow_html=True)
 
     st.markdown("<h4 style='color:#00d2d3; font-size:14px; margin: 25px 0 15px 0; border-bottom: 1px solid #30363d; padding-bottom: 5px; font-family:\"Rajdhani\", sans-serif; letter-spacing:1px;'>🚦 KEBERANGKATAN FEEDER 🚦</h4>", unsafe_allow_html=True)
     
@@ -186,7 +181,8 @@ with col_kanan:
     if not list_armada_ready:
         st.info(f"Belum ada penumpang untuk rute {tujuan_dipilih}.")
     else:
-        if 'reset_form_feeder' not in st.session_state: st.session_state.reset_form_feeder = 0
+        if 'reset_form_feeder' not in st.session_state: 
+            st.session_state.reset_form_feeder = 0
 
         with st.form(key=f"form_dispatch_{tujuan_dipilih}_{st.session_state.reset_form_feeder}", clear_on_submit=False):
             pilihan_massal = st.multiselect(f"Pilih Penumpang dari Unit Reguler tujuan ke ({tujuan_dipilih}):", options=list_armada_ready)
