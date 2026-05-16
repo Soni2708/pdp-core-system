@@ -11,7 +11,7 @@ from services.engine_kalkulasi import get_sla_limit
 from core.logger import setup_logger
 log = setup_logger("RADAR_KM72")
 
-st.set_page_config(page_title="CHECKPOINT KM72", page_icon="📡", layout="centered")
+st.set_page_config(page_title="CHECKPOINT KM72", page_icon="📡", layout="wide")
 apply_global_cyberpunk_theme()
 require_auth(module_name="km72", secret_dict_name="users_km72")
 
