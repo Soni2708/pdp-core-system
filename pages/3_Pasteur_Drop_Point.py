@@ -12,7 +12,7 @@ from services.engine_kalkulasi import hitung_wt
 from core.logger import setup_logger
 log = setup_logger("SYSTEM_PDP")
 
-st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="wide")
+st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="centered")
 apply_global_cyberpunk_theme()
 require_auth(module_name="pdp", secret_dict_name="users_pdp") 
 
@@ -137,26 +137,26 @@ with col_tengah:
 # --- PANEL KANAN ---
 with col_kanan:
     st.markdown("<div style='background-color:#161b22; border:1px solid #30363d; border-top:3px solid #00d2d3; border-radius:6px; padding:10px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0, 210, 211, 0.1);'><h4 style='color:#00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.4); font-size:15px; margin:0; text-align:center; font-family:\"Rajdhani\", sans-serif; letter-spacing:2px;'>📍 WAKTU TUNGGU PDP</h4></div>", unsafe_allow_html=True)
-    html_header = f"""
-    <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 12px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+    
+    st.markdown(f"""
+    <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 15px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">MIM / BUAHBATU</span><br>
-            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
+            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">MIM / BUAHBATU</span><br>
+            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">KOPO</span><br>
-            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
+            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">KOPO</span><br>
+            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%;">
-            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">JATINANGOR</span><br>
-            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
+            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">JATINANGOR</span><br>
+            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
         </div>
     </div>
-    """
-    st.markdown(html_header, unsafe_allow_html=True)
-    html_antrean = "<div style='max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;'>"
+    """, unsafe_allow_html=True)
+    
     for unit in monitor_antrean:
-        html_antrean += f"""
+        st.markdown(f"""
         <div style="line-height: 1.4; text-align: left; padding: 12px; background-color:#161b22; border-radius:6px; border: 1px solid #30363d; border-top: 3px solid #00d2d3; overflow: hidden; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
                 <span>
@@ -167,10 +167,7 @@ with col_kanan:
             </div>
             <ul style="margin: 4px 0 0 0; padding-left: 20px; font-size: 13px; color: #e2e8f0; list-style-type: square;">{unit['html']}</ul>
         </div>
-        """
-    html_antrean += "</div>"
-    if monitor_antrean:
-        st.markdown(html_antrean, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     st.markdown("<h4 style='color:#00d2d3; font-size:14px; margin: 25px 0 15px 0; border-bottom: 1px solid #30363d; padding-bottom: 5px; font-family:\"Rajdhani\", sans-serif; letter-spacing:1px;'>🚦 KEBERANGKATAN FEEDER 🚦</h4>", unsafe_allow_html=True)
     
