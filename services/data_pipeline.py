@@ -57,7 +57,8 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
                 "nopol": nopol, "driver": driver, "rute": rute, "jadwal": jadwal,
                 "pax_mim": pax_mim, "pax_kopo": pax_kopo, "pax_jtn": pax_jtn,
                 "baris_db": baris_db,
-                "trip_id": trip_id
+                "trip_id": trip_id,
+                "jam_72": jam_72  # <--- INI DIA TERSANGKANYA BRO! UDAH GUE TAMBAHIN!
             })
             
         elif jam_tiba_pdp != "":
@@ -77,26 +78,27 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
                         wt = hitung_wt(jam_tiba_pdp, waktu_sekarang)
                         
                         # Pengaturan Badge Warna Soft Neon Cyberpunk
-                        badge = f"<span style='color:#ff002e; text-shadow: 0 0 5px rgba(255, 77, 109, 0.4); font-weight:700;'>🚨 {wt} menit</span>" if wt >= 30 else f"<span style='color:#feca57; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4); font-weight:700;'>⏳ {wt} menit</span>"
-                        pax_info.append(f"<li style='margin-bottom:4px; text-align: left;'><span style='color:#ffffff;'>{tj}:</span> <b style='color:#00d2d3;'>{pax_count} Pax</b> &nbsp;{badge}</li>")
+                        if wt <= 10: badge = f"<span style='background-color:#161b22; color:#00d2d3; border: 1px solid #00d2d3; padding: 2px 6px; border-radius: 4px; font-weight:bold; box-shadow: 0 0 5px rgba(0,210,211,0.2);'>WT: {wt}</span>"
+                        elif wt <= 20: badge = f"<span style='background-color:#161b22; color:#feca57; border: 1px solid #feca57; padding: 2px 6px; border-radius: 4px; font-weight:bold; box-shadow: 0 0 5px rgba(254,202,87,0.2);'>WT: {wt}</span>"
+                        elif wt <= 30: badge = f"<span style='background-color:#161b22; color:#ff9f43; border: 1px solid #ff9f43; padding: 2px 6px; border-radius: 4px; font-weight:bold; box-shadow: 0 0 5px rgba(255,159,67,0.2);'>WT: {wt}</span>"
+                        else: badge = f"<span style='background-color:#161b22; color:#ff4757; border: 1px solid #ff4757; padding: 2px 6px; border-radius: 4px; font-weight:bold; box-shadow: 0 0 5px rgba(255,71,87,0.2);'>WT: {wt}</span>"
                         
-                        hasil["grup_tujuan"][tj].append({
-                            "label": label_armada, 
-                            "baris_db": baris_db,
-                            "jam_tiba": jam_tiba_pdp,
-                            "nopol": nopol,     
-                            "jadwal": jadwal,
-                            "trip_id": trip_id
-                        })
+                        pax_info.append(f"<li>{tj}: <b style='color:#feca57;'>{pax_count} Pax</b> {badge}</li>")
+                        hasil["grup_tujuan"][tj].append({"label": label_armada, "baris_db": baris_db, "trip_id": trip_id, "jam_tiba": jam_tiba_pdp})
                         hasil["total_pax"][tj] += pax_count
             
-            if pax_info:
+            if ada_pax and pax_info:
                 hasil["monitor_antrean"].append({
-                    "label": label_armada, "driver": driver, "tiba": jam_tiba_pdp, "html": "".join(pax_info)
+                    "label": label_armada,
+                    "driver": driver,
+                    "tiba": jam_tiba_pdp,
+                    "html": "".join(pax_info)
                 })
-                
-        # LOGIKA AUTO-CLEAN DATABASE
-        if (ada_pax and semua_berangkat) or (status == "IN TRANSIT" and jam_tiba_pdp != "" and not ada_pax):
-            hasil["auto_selesai_updates"].append({'range': f"I{baris_db}", 'values': [['Selesai']]})
+            
+            if semua_berangkat or not ada_pax:
+                hasil["auto_selesai_updates"].append({
+                    "baris": baris_db,
+                    "updates": {"H": "SELESAI"}
+                })
 
     return hasil
