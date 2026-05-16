@@ -12,7 +12,7 @@ from services.engine_kalkulasi import hitung_wt
 from core.logger import setup_logger
 log = setup_logger("SYSTEM_PDP")
 
-st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="centered")
+st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="wide")
 apply_global_cyberpunk_theme()
 require_auth(module_name="pdp", secret_dict_name="users_pdp") 
 
