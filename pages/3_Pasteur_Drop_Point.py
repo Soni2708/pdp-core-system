@@ -12,7 +12,7 @@ from services.engine_kalkulasi import hitung_wt
 from core.logger import setup_logger
 log = setup_logger("SYSTEM_PDP")
 
-st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="wide")
+st.set_page_config(page_title="PASTEUR DROP POINT", page_icon="🚐", layout="centered")
 apply_global_cyberpunk_theme()
 require_auth(module_name="pdp", secret_dict_name="users_pdp") 
 
@@ -113,8 +113,8 @@ with col_tengah:
                             <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
                             <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
                         </div>
-                        <div style="font-size: 15px; color: #ffffff; margin-bottom: 7px;">
-                            {unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span> | OUT KM72: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(0,210,211,0.3);">{unit.get('jam_72', '-')}</span>
+                        <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">
+                            {unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span> | OUT KM72: <span style="color:#00d2d3; font-weight:bold; text-shadow: 0 0 5px rgba(0,210,211,0.3);">{unit.get('jam_72', '-')}</span>
                         </div>
                         <div style="font-size: 14px; color: #8b949e; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
                             MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JTN: <b style="color:#feca57;">{unit['pax_jtn']}</b>
@@ -128,12 +128,10 @@ with col_tengah:
                             waktu_tiba = waktu_sekarang.strftime("%H:%M")
                             sukses, pesan = safe_update_by_uuid(unit['trip_id'], {"K": waktu_tiba})
                             if sukses:
-                                # ✅ LOGGING TIBA
                                 log.info(f"TIBA PDP: {unit['nopol']} ({unit['driver']}) tiba di Pasteur jam {waktu_tiba}.")
                                 st.cache_data.clear()
                                 st.rerun()
                             else:
-                                # ❌ LOGGING ERROR
                                 log.error(f"ERROR PDP: Gagal mencatat kedatangan {unit['nopol']}. Alasan: {pesan}")
                                 st.error(pesan)
             st.markdown("<hr style='margin:10px 0; border-top: 1px dashed #30363d !important;'>", unsafe_allow_html=True)
@@ -142,24 +140,25 @@ with col_tengah:
 with col_kanan:
     st.markdown("<div style='background-color:#161b22; border:1px solid #30363d; border-top:3px solid #00d2d3; border-radius:6px; padding:10px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0, 210, 211, 0.1);'><h4 style='color:#00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.4); font-size:15px; margin:0; text-align:center; font-family:\"Rajdhani\", sans-serif; letter-spacing:2px;'>📍 WAKTU TUNGGU PDP</h4></div>", unsafe_allow_html=True)
     
+    # 1. TULISAN RUTE SUDAH DIPERKECIL
     st.markdown(f"""
-    <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 15px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+    <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 12px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">MIM / BUAHBATU</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">MIM / BUAHBATU</span><br>
+            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">KOPO</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">KOPO</span><br>
+            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%;">
-            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">JATINANGOR</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">JATINANGOR</span><br>
+            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Bikin kotak yang bisa di-scroll dengan tinggi maksimal 400px
+    # 2. DAFTAR ANTREAN SUDAH JADI KOTAK SCROLLABLE
     html_antrean = "<div style='max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;'>"
     for unit in monitor_antrean:
         html_antrean += f"""
@@ -226,7 +225,6 @@ with col_kanan:
                             if uuid_updates:
                                 sukses, pesan = execute_batch_update_by_uuid(uuid_updates)
                                 if sukses:
-                                    # ✅ LOGGING DISPATCH FEEDER
                                     petugas = st.session_state.get('petugas_pdp', 'Unknown')
                                     log.info(f"DISPATCH: Petugas {petugas} memberangkatkan Feeder {nopol_f} ({drv_f}) rute {tujuan_dipilih}. Unit reguler: {pilihan_massal}.")
                                     
@@ -234,6 +232,5 @@ with col_kanan:
                                     st.cache_data.clear()
                                     st.rerun()            
                                 else:
-                                    # ❌ LOGGING ERROR
                                     log.error(f"ERROR DISPATCH: Gagal kirim feeder {tujuan_dipilih}. Alasan: {pesan}")
                                     st.error(pesan)
