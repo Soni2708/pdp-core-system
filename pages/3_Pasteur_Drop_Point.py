@@ -88,6 +88,7 @@ with col_kiri:
             <div style="line-height: 1.4; text-align: left; padding: 5px;">
                 <div style="margin-bottom: 5px;">
                     <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
+                    <!-- UKURAN FONT DRIVER DINAIIKAN KE 15px -->
                     <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
                 </div>
                 <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">{unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span></div>
@@ -111,11 +112,10 @@ with col_tengah:
                     <div style="line-height: 1.4; text-align: left; padding: 5px;">
                         <div style="margin-bottom: 5px;">
                             <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
+                            <!-- UKURAN FONT DRIVER DINAIIKAN KE 15px -->
                             <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
                         </div>
-                        <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">
-                            {unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span> | OUT KM72: <span style="color:#00d2d3; font-weight:bold; text-shadow: 0 0 5px rgba(0,210,211,0.3);">{unit['jam_72']}</span>
-                        </div>
+                        <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">{unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span></div>
                         <div style="font-size: 14px; color: #8b949e; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
                             MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JTN: <b style="color:#feca57;">{unit['pax_jtn']}</b>
                         </div>
@@ -165,6 +165,7 @@ with col_kanan:
             <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
                 <span>
                     <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['label']}</span>
+                    <!-- UKURAN FONT DRIVER DINAIIKAN KE 15px -->
                     <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;"> [ {unit['driver']} ]</span>
                 </span>
                 <span style="font-size: 12px; color: #feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">🕒 TIBA: {unit['tiba']}</span>
