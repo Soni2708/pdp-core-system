@@ -137,8 +137,7 @@ with col_tengah:
 # --- PANEL KANAN ---
 with col_kanan:
     st.markdown("<div style='background-color:#161b22; border:1px solid #30363d; border-top:3px solid #00d2d3; border-radius:6px; padding:10px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0, 210, 211, 0.1);'><h4 style='color:#00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.4); font-size:15px; margin:0; text-align:center; font-family:\"Rajdhani\", sans-serif; letter-spacing:2px;'>📍 WAKTU TUNGGU PDP</h4></div>", unsafe_allow_html=True)
-    
-    st.markdown(f"""
+    html_header = f"""
     <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 12px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
             <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">MIM / BUAHBATU</span><br>
@@ -153,8 +152,8 @@ with col_kanan:
             <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
-    
+    """
+    st.markdown(html_header, unsafe_allow_html=True)
     html_antrean = "<div style='max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;'>"
     for unit in monitor_antrean:
         html_antrean += f"""
@@ -170,8 +169,8 @@ with col_kanan:
         </div>
         """
     html_antrean += "</div>"
-    
-    st.markdown(html_antrean, unsafe_allow_html=True)
+    if monitor_antrean:
+        st.markdown(html_antrean, unsafe_allow_html=True)
 
     st.markdown("<h4 style='color:#00d2d3; font-size:14px; margin: 25px 0 15px 0; border-bottom: 1px solid #30363d; padding-bottom: 5px; font-family:\"Rajdhani\", sans-serif; letter-spacing:1px;'>🚦 KEBERANGKATAN FEEDER 🚦</h4>", unsafe_allow_html=True)
     
