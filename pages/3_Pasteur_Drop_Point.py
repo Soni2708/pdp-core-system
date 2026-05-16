@@ -83,16 +83,16 @@ with col_kiri:
     else:
         for unit in armada_portal_kiri:
             st.markdown(f"""
-            <div style="line-height: 1.4; text-align: left; padding: 5px;">
-                <div style="margin-bottom: 5px;">
-                    <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
-                    <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
-                </div>
-                <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">{unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span></div>
-                <div style="font-size: 14px; color: #8b949e; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
-                    MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JATINANGOR: <b style="color:#feca57;">{unit['pax_jtn']}</b>
-                </div>
-            </div><hr style="margin:10px 0; border-top: 1px dashed #30363d !important;">
+<div style="line-height: 1.4; text-align: left; padding: 5px;">
+    <div style="margin-bottom: 5px;">
+        <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
+        <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
+    </div>
+    <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">{unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span></div>
+    <div style="font-size: 14px; color: #8b949e; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
+        MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JATINANGOR: <b style="color:#feca57;">{unit['pax_jtn']}</b>
+    </div>
+</div><hr style="margin:10px 0; border-top: 1px dashed #30363d !important;">
             """, unsafe_allow_html=True)
 
 # --- PANEL TENGAH ---
@@ -106,18 +106,18 @@ with col_tengah:
                 c_teks, c_tombol = st.columns([2.5, 1])
                 with c_teks:
                     st.markdown(f"""
-                    <div style="line-height: 1.4; text-align: left; padding: 5px;">
-                        <div style="margin-bottom: 5px;">
-                            <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
-                            <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
-                        </div>
-                        <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">
-                            {unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span> | OUT KM72: <span style="color:#00d2d3; font-weight:bold; text-shadow: 0 0 5px rgba(0,210,211,0.3);">{unit.get('jam_72', '-')}</span>
-                        </div>
-                        <div style="font-size: 14px; color: #8b949e; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
-                            MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JTN: <b style="color:#feca57;">{unit['pax_jtn']}</b>
-                        </div>
-                    </div>
+<div style="line-height: 1.4; text-align: left; padding: 5px;">
+    <div style="margin-bottom: 5px;">
+        <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
+        <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
+    </div>
+    <div style="font-size: 15px; color: #8b949e; margin-bottom: 8px;">
+        {unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span> | OUT KM72: <span style="color:#00d2d3; font-weight:bold; text-shadow: 0 0 5px rgba(0,210,211,0.3);">{unit.get('jam_72', '-')}</span>
+    </div>
+    <div style="font-size: 14px; color: #8b949e; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
+        MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JTN: <b style="color:#feca57;">{unit['pax_jtn']}</b>
+    </div>
+</div>
                     """, unsafe_allow_html=True)
                 with c_tombol:
                     st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
@@ -139,44 +139,40 @@ with col_kanan:
     st.markdown("<div style='background-color:#161b22; border:1px solid #30363d; border-top:3px solid #00d2d3; border-radius:6px; padding:10px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0, 210, 211, 0.1);'><h4 style='color:#00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.4); font-size:15px; margin:0; text-align:center; font-family:\"Rajdhani\", sans-serif; letter-spacing:2px;'>📍 WAKTU TUNGGU PDP</h4></div>", unsafe_allow_html=True)
     
     st.markdown(f"""
-    <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 12px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-        <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">MIM / BUAHBATU</span><br>
-            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
-        </div>
-        <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">KOPO</span><br>
-            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
-        </div>
-        <div style="text-align: center; width: 33%;">
-            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">JATINANGOR</span><br>
-            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
-        </div>
+<div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 12px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+    <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
+        <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">MIM / BUAHBATU</span><br>
+        <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
     </div>
+    <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
+        <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">KOPO</span><br>
+        <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
+    </div>
+    <div style="text-align: center; width: 33%;">
+        <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">JATINANGOR</span><br>
+        <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
+    </div>
+</div>
     """, unsafe_allow_html=True)
     
-    # IMPLEMENTASI SCROLLABLE BOX AMAN ANTI ERROR
-    if monitor_antrean:
-        html_antrean = "<div style='max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;'>"
-        for unit in monitor_antrean:
-            html_antrean += f"""
-            <div style="line-height: 1.4; text-align: left; padding: 12px; background-color:#161b22; border-radius:6px; border: 1px solid #30363d; border-top: 3px solid #00d2d3; overflow: hidden; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
-                    <span>
-                        <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['label']}</span>
-                        <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;"> [ {unit['driver']} ]</span>
-                    </span>
-                    <span style="font-size: 12px; color: #feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">🕒 TIBA: {unit['tiba']}</span>
-                </div>
-                <ul style="margin: 4px 0 0 0; padding-left: 20px; font-size: 13px; color: #e2e8f0; list-style-type: square;">{unit['html']}</ul>
-            </div>
-            """
-        html_antrean += "</div>"
-        st.markdown(html_antrean, unsafe_allow_html=True)
+    # KEMBALI KE SISTEM ASLI (NON-SCROLLABLE) ANTI-BOCOR
+    for unit in monitor_antrean:
+        st.markdown(f"""
+<div style="line-height: 1.4; text-align: left; padding: 12px; background-color:#161b22; border-radius:6px; border: 1px solid #30363d; border-top: 3px solid #00d2d3; overflow: hidden; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
+        <span>
+            <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['label']}</span>
+            <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;"> [ {unit['driver']} ]</span>
+        </span>
+        <span style="font-size: 12px; color: #feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">🕒 TIBA: {unit['tiba']}</span>
+    </div>
+    <ul style="margin: 4px 0 0 0; padding-left: 20px; font-size: 13px; color: #e2e8f0; list-style-type: square;">{unit['html']}</ul>
+</div>
+        """, unsafe_allow_html=True)
 
     st.markdown("<h4 style='color:#00d2d3; font-size:14px; margin: 25px 0 15px 0; border-bottom: 1px solid #30363d; padding-bottom: 5px; font-family:\"Rajdhani\", sans-serif; letter-spacing:1px;'>🚦 KEBERANGKATAN FEEDER 🚦</h4>", unsafe_allow_html=True)
     
-    tujuan_dipilih = st.radio("Pilih Rute Tujuan:", ["MIM / BUAHBATU", "KOPO", "JATINANGOR"], horizontal=True)
+    tujuan_dipilih = st.radio("Pilih Rute Tujuan:", ["MIM/BUAH BATU", "KOPO", "JATINANGOR"], horizontal=True)
     list_armada_ready = [item['label'] for item in grup_tujuan[tujuan_dipilih]]
     
     if not list_armada_ready:
@@ -205,7 +201,7 @@ with col_kanan:
                     else:
                         with st.spinner("Sinkronisasi keberangkatan Feeder..."):
                             jam_out = waktu_sekarang.strftime("%H:%M")
-                            map_kolom = {"MIM / BUAHBATU": ["L", "M", "N", "O"], "KOPO": ["P", "Q", "R", "S"], "JATINANGOR": ["T", "U", "V", "W"]}[tujuan_dipilih]
+                            map_kolom = {"MIM/BUAH BATU": ["L", "M", "N", "O"], "KOPO": ["P", "Q", "R", "S"], "JATINANGOR": ["T", "U", "V", "W"]}[tujuan_dipilih]
                             c_drv, c_nopol, c_jam, c_wt = map_kolom
                             
                             uuid_updates = []
