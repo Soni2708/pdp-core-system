@@ -139,35 +139,40 @@ with col_kanan:
     st.markdown("<div style='background-color:#161b22; border:1px solid #30363d; border-top:3px solid #00d2d3; border-radius:6px; padding:10px; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0, 210, 211, 0.1);'><h4 style='color:#00d2d3; text-shadow: 0 0 8px rgba(0, 210, 211, 0.4); font-size:15px; margin:0; text-align:center; font-family:\"Rajdhani\", sans-serif; letter-spacing:2px;'>📍 WAKTU TUNGGU PDP</h4></div>", unsafe_allow_html=True)
     
     st.markdown(f"""
-    <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 15px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+    <div style="display: flex; justify-content: space-between; background-color: #161b22; padding: 12px; border-radius:8px; border: 1px solid #30363d; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">MIM / BUAHBATU</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">MIM / BUAHBATU</span><br>
+            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['MIM / BUAHBATU']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%; border-right: 1px solid #30363d;">
-            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">KOPO</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">KOPO</span><br>
+            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['KOPO']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
         </div>
         <div style="text-align: center; width: 33%;">
-            <span style="color: #8b949e; font-size: 11px; font-weight: 700; letter-spacing:1px;">JATINANGOR</span><br>
-            <span style="color: #00d2d3; font-size: 28px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 12px;">PAX</span>
+            <span style="color: #8b949e; font-size: 9px; font-weight: 700; letter-spacing:0.5px;">JATINANGOR</span><br>
+            <span style="color: #00d2d3; font-size: 22px; font-weight: bold; font-family:'Rajdhani', sans-serif; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{total_pax_antre['JATINANGOR']}</span> <span style="color: #8b949e; font-size: 10px;">PAX</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    for unit in monitor_antrean:
-        st.markdown(f"""
-        <div style="line-height: 1.4; text-align: left; padding: 12px; background-color:#161b22; border-radius:6px; border: 1px solid #30363d; border-top: 3px solid #00d2d3; overflow: hidden; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
-                <span>
-                    <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['label']}</span>
-                    <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;"> [ {unit['driver']} ]</span>
-                </span>
-                <span style="font-size: 12px; color: #feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">🕒 TIBA: {unit['tiba']}</span>
+    # IMPLEMENTASI SCROLLABLE BOX AMAN ANTI ERROR
+    if monitor_antrean:
+        html_antrean = "<div style='max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;'>"
+        for unit in monitor_antrean:
+            html_antrean += f"""
+            <div style="line-height: 1.4; text-align: left; padding: 12px; background-color:#161b22; border-radius:6px; border: 1px solid #30363d; border-top: 3px solid #00d2d3; overflow: hidden; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #30363d; padding-bottom:8px; margin-bottom:8px;">
+                    <span>
+                        <span style="font-family:'Rajdhani', sans-serif; font-size: 20px; font-weight: bold; color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['label']}</span>
+                        <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;"> [ {unit['driver']} ]</span>
+                    </span>
+                    <span style="font-size: 12px; color: #feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">🕒 TIBA: {unit['tiba']}</span>
+                </div>
+                <ul style="margin: 4px 0 0 0; padding-left: 20px; font-size: 13px; color: #e2e8f0; list-style-type: square;">{unit['html']}</ul>
             </div>
-            <ul style="margin: 4px 0 0 0; padding-left: 20px; font-size: 13px; color: #e2e8f0; list-style-type: square;">{unit['html']}</ul>
-        </div>
-        """, unsafe_allow_html=True)
+            """
+        html_antrean += "</div>"
+        st.markdown(html_antrean, unsafe_allow_html=True)
 
     st.markdown("<h4 style='color:#00d2d3; font-size:14px; margin: 25px 0 15px 0; border-bottom: 1px solid #30363d; padding-bottom: 5px; font-family:\"Rajdhani\", sans-serif; letter-spacing:1px;'>🚦 KEBERANGKATAN FEEDER 🚦</h4>", unsafe_allow_html=True)
     
