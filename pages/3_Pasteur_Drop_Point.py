@@ -114,7 +114,7 @@ with col_tengah:
                             <span style="font-size: 15px; font-weight: bold; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
                         </div>
                         <div style="font-size: 15px; color: #ffffff; margin-bottom: 7px;">
-                            {unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span> | OUT KM72: <span style="color:#00d2d3; font-weight:bold; text-shadow: 0 0 5px rgba(0,210,211,0.3);">{unit.get('jam_72', '-')}</span>
+                            {unit['rute']} | JAM: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(254,202,87,0.3);">{unit['jadwal']}</span> | OUT KM72: <span style="color:#feca57; font-weight:bold; text-shadow: 0 0 5px rgba(0,210,211,0.3);">{unit.get('jam_72', '-')}</span>
                         </div>
                         <div style="font-size: 14px; color: #8b949e; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
                             MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JTN: <b style="color:#feca57;">{unit['pax_jtn']}</b>
