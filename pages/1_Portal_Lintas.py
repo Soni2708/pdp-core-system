@@ -65,7 +65,7 @@ with col2:
     pilihan_jadwal = st.selectbox("🕒 Jadwal Operasional", options=opsi_jadwal, key=f"jadwal_{st.session_state.kunci_reset}")
     
     if pilihan_rute != "-- Pilih Rute --":
-        st.caption("🔒 *Hanya menampilkan jadwal shift terdekat.*")
+        st.caption("🔒 *Hanya menampilkan jadwal terdekat.*")
     
     with st.expander("Klik disini untuk jadwal Extra"):
         pakai_jadwal_extra = st.checkbox("Gunakan Jadwal Extra", key=f"cek_extra_{st.session_state.kunci_reset}")
