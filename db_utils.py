@@ -94,7 +94,7 @@ def safe_append_reguler(data_baru):
 # ============================================================
 # 🚨 READ: PURE LIVE DATA (SUPABASE V8)
 # ============================================================
-@st.cache_data(ttl=5)
+@st.cache_data(ttl=2)
 def fetch_mapped_data():
     try:
         supabase = get_supabase_client()
@@ -123,7 +123,6 @@ def fetch_mapped_data():
                 "jam_72": safe_str(row.get("jam_keluar_km72")),
                 "jam_tiba_pdp": safe_str(row.get("jam_tiba_pdp")),
                 
-                # 👇 INI YANG TADI KETINGGALAN, BRO!
                 "driver_mim_bbt": safe_str(row.get("driver_mim_buahbatu")),
                 "nopol_mim_bbt": safe_str(row.get("nopol_mim_buahbatu")),
                 "jam_out_mim": safe_str(row.get("mim_bbt_out")),
@@ -142,6 +141,11 @@ def fetch_mapped_data():
                 "keterangan": safe_str(row.get("keterangan")),
                 "trip_id": safe_str(row.get("trip_id")) 
             })
+            
+        # 👇 INI DIA MESIN SORTIRNYA, BRO!
+        # Mengurutkan data berdasarkan kolom 'jadwal' (dari jam terkecil ke terbesar)
+        mapped_data = sorted(mapped_data, key=lambda x: x['jadwal'])
+        
         return mapped_data
     except Exception as e:
         st.error(f"Gagal Menarik Data Supabase: {e}")
