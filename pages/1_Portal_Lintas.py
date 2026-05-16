@@ -67,7 +67,7 @@ with col2:
     if pilihan_rute != "-- Pilih Rute --":
         st.caption("🔒 *Hanya menampilkan jadwal shift terdekat.*")
     
-    with st.expander("Jadwal tidak ada di daftar? Klik di sini"):
+    with st.expander("Klik disini untuk jadwal Extra"):
         pakai_jadwal_extra = st.checkbox("Gunakan Jadwal Extra", key=f"cek_extra_{st.session_state.kunci_reset}")
         jam_extra = st.time_input("Pilih Jam Keberangkatan", disabled=not pakai_jadwal_extra, key=f"jam_extra_{st.session_state.kunci_reset}")
         if pakai_jadwal_extra: st.caption("✅ Jadwal Extra diaktifkan.")
