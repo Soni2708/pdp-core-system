@@ -5,7 +5,7 @@ from streamlit_autorefresh import st_autorefresh
 from components.ui_styles import apply_global_cyberpunk_theme
 from core.auth import require_auth, logout_user
 from db_utils import get_waktu_wib, fetch_mapped_data, execute_batch_update, safe_update_by_uuid
-from services.engine_kalkulasi import get_sla_limit
+from services.engine_kalkulasi import get_sla_limit, normalize_time_format
 
 # INJEKSI LOGGER
 from core.logger import setup_logger
@@ -38,7 +38,8 @@ if semua_data:
         if "IN TRANSIT" in status and jam_72 == "":
             jumlah_armada_jalan += 1
             try:
-                jadwal_dt = datetime.strptime(jadwal, "%H:%M")
+                jadwal_aman = normalize_time_format(jadwal)
+                jadwal_dt = datetime.strptime(jadwal_aman, "%H:%M")
                 jadwal_real = waktu_sekarang.replace(hour=jadwal_dt.hour, minute=jadwal_dt.minute, second=0, microsecond=0)
                 if (waktu_sekarang - jadwal_real).total_seconds() < -43200: 
                     jadwal_real -= timedelta(days=1)
@@ -46,7 +47,10 @@ if semua_data:
                 lama_jalan = int((waktu_sekarang - jadwal_real).total_seconds() / 60)
                 if lama_jalan < 0: lama_jalan = 0
                 if lama_jalan > sla_limit: is_overdue = True
-            except Exception: pass
+            except Exception as e:
+                log.error(f"CORRUPTED TIME FORMAT DETECTED: {jadwal} pada Armada {nopol}. {e}")
+                is_overdue = True  # Peringatan paksa agar operator sadar ada anomali
+                lama_jalan = 999
 
             armada_aktif.append({
                 "nopol": nopol, "rute": rute, "jadwal": jadwal, 
@@ -68,13 +72,13 @@ with c2:
 col_judul, col_spacer, col_sync, col_logout = st.columns([5, 3, 1, 0.8])
 with col_judul:
     st.markdown("<h2 style='color: #ffffff; font-family: \"Rajdhani\", sans-serif; font-size: 32px; font-weight: 700; margin-top: -10px; margin-bottom: 5px; letter-spacing: 3px; text-shadow: 0 0 10px rgba(0, 210, 211, 0.3);'>CHECKPOINT KM72</h2>", unsafe_allow_html=True)
-    status_pulse = "<span style='color:#feca57; font-weight:700; text-shadow: 0 0 8px rgba(254, 202, 87, 0.4);'>📡  Active Tracking...</span>" if jumlah_armada_jalan > 0 else "<span style='color:#8b949e; font-weight:700;'>💤 Standby</span>"
+    status_pulse = "<span style='color:#feca57; font-weight:700; text-shadow: 0 0 8px rgba(254, 202, 87, 0.4);'>⚡  Active Tracking...</span>" if jumlah_armada_jalan > 0 else "<span style='color:#8b949e; font-weight:700;'>💤 Standby</span>"
     st.markdown(f"<p style='text-align: left; margin-top:-5px; font-size:13px; font-family:\"Inter\", sans-serif;'><span style='color:#8b949e;'>Sistem Pemantauan Checkpoint</span> | <span style='color:#00d2d3; font-weight:bold;'>USER: {st.session_state.get('petugas_km72', '')}</span> | {status_pulse}</p>", unsafe_allow_html=True)
 
 with col_sync:
     st.markdown('<div class="btn-sync" style="margin-top:10px;">', unsafe_allow_html=True)
     if st.button("🔄 Refresh"): 
-        st.cache_data.clear() 
+        fetch_mapped_data.clear() 
         st.rerun() 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -103,16 +107,17 @@ else:
         with cols[index % 3]:
             # Soft Neon Card Layout
             border_color = "#ff4d6d" if unit['is_overdue'] else "#30363d"
-            top_border = "#ff4d6d" if unit['is_overdue'] else "#00d2d3"
+            accent_border = "#ff4d6d" if unit['is_overdue'] else "#00d2d3" # Variabel di-rename agar relevan
             shadow_color = "rgba(255, 77, 109, 0.15)" if unit['is_overdue'] else "rgba(0, 210, 211, 0.05)"
             
-            st.markdown(f"<div style='background-color:#161b22; border:1px solid {border_color}; border-top:3px solid {top_border}; border-radius:8px; padding:15px; margin-bottom:15px; box-shadow: 0 4px 12px {shadow_color};'>", unsafe_allow_html=True)
+            # 💉 NEXUS PRIME PATCH: Transmutasi border-top menjadi border-left dengan ketebalan 4px
+            st.markdown(f"<div style='background-color:#161b22; border:1px solid {border_color}; border-left:4px solid {accent_border}; border-radius:8px; padding:15px; margin-bottom:15px; box-shadow: 0 4px 12px {shadow_color};'>", unsafe_allow_html=True)
             
             if unit['is_overdue']:
                 kelebihan = unit['lama_jalan'] - unit['sla_limit']
                 badge_html = f"<div class='badge-overdue' style='width:100%; text-align:center;'>🚨 OVERDUE (+{kelebihan} Mnt)</div>"
             else:
-                badge_html = f"<div class='badge-normal' style='width:100%; text-align:center;'>⏱️ DURASI: {unit['lama_jalan']} / {unit['sla_limit']} MENIT</div>"
+                badge_html = f"<div class='badge-normal' style='width:100%; text-align:center;'>⏱️ Durasi Perjalanan: {unit['lama_jalan']} / {unit['sla_limit']} MENIT</div>"
 
             st.markdown(f"""
                 <div style="line-height: 1.4; text-align: left; margin-bottom: 12px;">
@@ -122,7 +127,7 @@ else:
                         <span style="font-size: 15px; font-weight: 700; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
                     </div>
                     <div style="font-size: 13px; color: #8b949e; margin-bottom:3px; font-family:'Inter', sans-serif;">RUTE: <span style="color:#ebeef2; font-weight:600;">{unit['rute']}</span></div>
-                    <div style="font-size: 13px; color: #8b949e; font-family:'Inter', sans-serif;">JAM: <span style="color:#feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">{unit['jadwal']} WIB</span></div>
+                    <div style="font-size: 13px; color: #8b949e; font-family:'Inter', sans-serif;">JADWAL: <span style="color:#feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">{unit['jadwal']} WIB</span></div>
                 </div>
                 {badge_html}
             """, unsafe_allow_html=True)
@@ -139,11 +144,11 @@ else:
                         petugas = st.session_state.get('petugas_km72', 'Unknown')
                         log.info(f"CHECKOUT KM72: {unit['nopol']} ({unit['driver']}) dicheckout oleh {petugas}.")
                         
-                        st.cache_data.clear()
+                        fetch_mapped_data.clear()
                         st.rerun()
                     else:
                         # ❌ LOGGING ERROR
                         log.error(f"ERROR KM72: Gagal checkout {unit['nopol']}. Alasan: {pesan}")
-                        st.error(pesan)
+                        st.toast(pesan, icon="⚠️")
                         
             st.markdown("</div>", unsafe_allow_html=True)
