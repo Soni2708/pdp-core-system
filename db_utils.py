@@ -95,10 +95,16 @@ def safe_append_reguler(data_baru):
 # 🚨 READ: PURE LIVE DATA (SUPABASE V8)
 # ============================================================
 @st.cache_data(ttl=2)
-def fetch_mapped_data():
+def fetch_mapped_data(is_laporan=False): # 💉 Parameter pemisah jalur
     try:
         supabase = get_supabase_client()
-        res = supabase.table("operasional_pdp").select("*").order("id", desc=False).execute()
+        base_query = supabase.table("operasional_pdp").select("*")
+        
+        # 💉 Filter presisi level database (Cloud architecture)
+        if not is_laporan:
+            res = base_query.eq("status", "IN TRANSIT").order("id", desc=False).execute()
+        else:
+            res = base_query.order("id", desc=False).execute()
         
         def safe_str(val):
             if val is None: return ""
@@ -142,14 +148,14 @@ def fetch_mapped_data():
                 "trip_id": safe_str(row.get("trip_id")) 
             })
             
-        # 👇 INI DIA MESIN SORTIRNYA, BRO!
-        # Mengurutkan data berdasarkan kolom 'jadwal' (dari jam terkecil ke terbesar)
+        # 👇 MESIN SORTIR DATA OPERASIONAL
         mapped_data = sorted(mapped_data, key=lambda x: x['jadwal'])
         
         return mapped_data
     except Exception as e:
-        st.error(f"Gagal Menarik Data Supabase: {e}")
-        return []
+        # 💉 NEXUS PRIME PATCH: Gunakan Toast elegan dan kembalikan None agar UI Fallback aktif
+        st.toast(f"Koneksi Core Data Terputus: {e}", icon="🚨")
+        return None
 
 # ============================================================
 # 🛡️ UPDATE: ENGINE PRESISI BERBASIS UUID & MAPPING
@@ -163,13 +169,25 @@ def safe_update_by_uuid(trip_id, updates_dict):
     except Exception as e: return False, str(e)
 
 def execute_batch_update_by_uuid(uuid_updates):
-    try:
-        supabase = get_supabase_client()
-        for item in uuid_updates:
+    """
+    Eksekutor pembaruan massal berbasis UUID dengan arsitektur fault-tolerance.
+    Kegagalan pada satu item tidak akan membatalkan eksekusi item lainnya dalam antrean.
+    """
+    supabase = get_supabase_client()
+    errors = []
+    
+    for item in uuid_updates:
+        try:
             payload = {COL_MAP[col]: val for col, val in item["updates"].items() if col in COL_MAP}
-            if payload: supabase.table("operasional_pdp").update(payload).eq("trip_id", item["trip_id"]).execute()
-        return True, "Batch Update Massal Sukses"
-    except Exception as e: return False, str(e)
+            if payload: 
+                supabase.table("operasional_pdp").update(payload).eq("trip_id", item["trip_id"]).execute()
+        except Exception as e:
+            # 💉 NEXUS PRIME PATCH: Isolasi error per item ke dalam list, pertahankan loop berjalan
+            errors.append(f"Gagal UUID {item['trip_id'][:6]}: {str(e)}")
+            
+    if errors:
+        return False, " | ".join(errors)
+    return True, "Batch Update Massal Sukses"
 
 def execute_batch_update(payloads):
     """ Penerjemah Range Excel ke ID Database secara transparan """
@@ -211,7 +229,8 @@ def fetch_master_config():
 # ============================================================
 def generate_excel_report(tanggal_filter=None, bulan_filter=None, tahun_filter=None, start_date=None, end_date=None):
     try:
-        data = fetch_mapped_data()
+        # Buka data historis khusus laporan
+        data = fetch_mapped_data(is_laporan=True) 
         if not data: return None
         
         df = pd.DataFrame(data)
@@ -234,18 +253,15 @@ def generate_excel_report(tanggal_filter=None, bulan_filter=None, tahun_filter=N
                    df['waktu_input'].str.contains(bulan_str_2, case=False, na=False)
             df = df[mask]
             
-        # 📆 LOGIKA FILTER MINGGUAN / RENTANG WAKTU (BARU!)
+        # 📆 LOGIKA FILTER MINGGUAN / RENTANG WAKTU
         elif start_date and end_date:
-            # Ubah teks tanggal di database menjadi objek Date beneran biar bisa dihitung
             df['tanggal_asli'] = pd.to_datetime(df['waktu_input'], errors='coerce').dt.date
-            # Saring data yang berada di antara start_date dan end_date
             mask = (df['tanggal_asli'] >= start_date) & (df['tanggal_asli'] <= end_date)
             df = df[mask]
-            df = df.drop(columns=['tanggal_asli']) # Hapus kolom bantuan
+            df = df.drop(columns=['tanggal_asli'])
 
         if df.empty: return None
         
-        # Kolom tetap sama persis
         kolom_rapi = [
             "waktu_input", "trip_id", "rute", "jadwal", "nopol", "driver", 
             "status", "jam_72", "jam_tiba_pdp", 
