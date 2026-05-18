@@ -1,4 +1,5 @@
 import streamlit as st
+import base64 # Injeksi untuk Logo Adaptive
 from datetime import datetime, timedelta
 from streamlit_autorefresh import st_autorefresh 
 
@@ -64,27 +65,39 @@ armada_aktif.sort(key=lambda x: (not x['is_overdue'], -x['lama_jalan']))
 waktu_refresh = 60000 if jumlah_armada_jalan > 0 else 300000
 st_autorefresh(interval=waktu_refresh, key="refresh_km72_smart")
 
-c1, c2, c3 = st.columns([4, 0.7, 4])
-with c2:
-    try: st.image("assets/logo.png", width="stretch")
-    except: pass
+# ============================================================
+# 🚀 ADAPTIVE BRANDING LOGO (FLEXBOX)
+# ============================================================
+try:
+    with open("assets/logo.png", "rb") as img_file:
+        img_b64 = base64.b64encode(img_file.read()).decode()
+    st.markdown(f"""
+        <div style='display: flex; justify-content: center; align-items: center; margin-bottom: 15px; width: 100%; padding-top: 10px;'>
+            <img src='data:image/png;base64,{img_b64}' style='max-width: 160px; height: auto; object-fit: contain; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));'>
+        </div>
+    """, unsafe_allow_html=True)
+except FileNotFoundError:
+    pass
 
-col_judul, col_spacer, col_sync, col_logout = st.columns([5, 3, 1, 0.8])
+# 💉 NEXUS PRIME REFACTOR: Vertical Alignment untuk Header Grid agar Tombol Sejajar Bawah
+col_judul, col_spacer, col_sync, col_logout = st.columns([5, 2.5, 1.2, 1.3], vertical_alignment="bottom")
+
 with col_judul:
-    st.markdown("<h2 style='color: #ffffff; font-family: \"Rajdhani\", sans-serif; font-size: 32px; font-weight: 700; margin-top: -10px; margin-bottom: 5px; letter-spacing: 3px; text-shadow: 0 0 10px rgba(0, 210, 211, 0.3);'>CHECKPOINT KM72</h2>", unsafe_allow_html=True)
-    status_pulse = "<span style='color:#feca57; font-weight:700; text-shadow: 0 0 8px rgba(254, 202, 87, 0.4);'>⚡  Active Tracking...</span>" if jumlah_armada_jalan > 0 else "<span style='color:#8b949e; font-weight:700;'>💤 Standby</span>"
-    st.markdown(f"<p style='text-align: left; margin-top:-5px; font-size:13px; font-family:\"Inter\", sans-serif;'><span style='color:#8b949e;'>Sistem Pemantauan Checkpoint</span> | <span style='color:#00d2d3; font-weight:bold;'>USER: {st.session_state.get('petugas_km72', '')}</span> | {status_pulse}</p>", unsafe_allow_html=True)
+    # 💉 NEXUS PRIME FIX: Menambahkan border-bottom agar selaras dengan halaman Home
+    st.markdown("<h2 style='color: var(--text-primary); font-family: \"Rajdhani\", sans-serif; font-size: 32px; font-weight: 700; margin-top: -10px; margin-bottom: 5px; letter-spacing: 3px; border-bottom: 3px solid var(--accent-yellow); display: inline-block; padding-bottom: 6px;'>CHECKPOINT KM72</h2>", unsafe_allow_html=True)
+    status_pulse = "<span style='color:var(--accent-yellow); font-weight:700;'>⚡  Active Tracking...</span>" if jumlah_armada_jalan > 0 else "<span style='color:var(--text-muted); font-weight:700;'>💤 Standby</span>"
+    st.markdown(f"<p style='text-align: left; margin-top:-5px; font-size:13px; font-family:\"Inter\", sans-serif;'><span style='color:var(--text-muted);'>Sistem Pemantauan Checkpoint</span> | <span style='color:var(--accent-cyan); font-weight:bold;'>USER: {st.session_state.get('petugas_km72', '')}</span> | {status_pulse}</p>", unsafe_allow_html=True)
 
 with col_sync:
-    st.markdown('<div class="btn-sync" style="margin-top:10px;">', unsafe_allow_html=True)
-    if st.button("🔄 Refresh"): 
+    st.markdown('<div class="btn-sync">', unsafe_allow_html=True) # Margin manual dihapus
+    if st.button("🔄 Refresh", use_container_width=True): 
         fetch_mapped_data.clear() 
         st.rerun() 
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_logout:
-    st.markdown('<div class="btn-logout" style="margin-top:10px;">', unsafe_allow_html=True)
-    if st.button("Logout"): logout_user("km72")           
+    st.markdown('<div class="btn-logout">', unsafe_allow_html=True) # Margin manual dihapus
+    if st.button("Logout", use_container_width=True): logout_user("km72")           
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.divider()
@@ -92,26 +105,27 @@ st.divider()
 unit_overdue = sum(1 for u in armada_aktif if u['is_overdue'])
 unit_aman = len(armada_aktif) - unit_overdue
 
+# ============================================================
+# 📊 METRICS PANEL (ADAPTIVE THEME)
+# ============================================================
 m1, m2, m3 = st.columns(3)
 with m1: st.metric(label="Unit Terdeteksi", value=len(armada_aktif))
-with m2: st.markdown(f"""<div style="background:#161b22; padding:15px; border:1px solid #30363d; border-radius:8px; border-left:4px solid #00d2d3; text-align:center; box-shadow: 0 0 15px rgba(0, 210, 211, 0.1);"><small style="color:#8b949e; font-weight:500; letter-spacing:1px;">On-Track</small><br><b style="font-size:28px; color:#00d2d3; text-shadow: 0 0 10px rgba(0,210,211,0.3);">{unit_aman}</b></div>""", unsafe_allow_html=True)
-with m3: st.markdown(f"""<div style="background:#161b22; padding:15px; border:1px solid #30363d; border-radius:8px; border-left:4px solid #ff4d6d; text-align:center; box-shadow: 0 0 15px rgba(255, 77, 109, 0.1);"><small style="color:#8b949e; font-weight:500; letter-spacing:1px;">Overdue</small><br><b style="font-size:28px; color:#ff4d6d; text-shadow: 0 0 10px rgba(255,77,109,0.3);">{unit_overdue}</b></div>""", unsafe_allow_html=True)
+with m2: st.markdown(f"""<div style="background:var(--bg-surface); padding:15px; border:1px solid var(--border-color); border-radius:8px; border-left:4px solid var(--accent-cyan); text-align:center; box-shadow: var(--shadow-subtle);"><small style="color:var(--text-muted); font-weight:600; letter-spacing:1px;">On-Track</small><br><b style="font-size:28px; color:var(--accent-cyan);">{unit_aman}</b></div>""", unsafe_allow_html=True)
+with m3: st.markdown(f"""<div style="background:var(--bg-surface); padding:15px; border:1px solid var(--border-color); border-radius:8px; border-left:4px solid var(--accent-red); text-align:center; box-shadow: var(--shadow-subtle);"><small style="color:var(--text-muted); font-weight:600; letter-spacing:1px;">Overdue</small><br><b style="font-size:28px; color:var(--accent-red);">{unit_overdue}</b></div>""", unsafe_allow_html=True)
 
 st.markdown("<hr>", unsafe_allow_html=True)
 
 if not armada_aktif:
-    st.markdown("<div style='background-color: #161b22; padding: 20px; border: 1px solid #30363d; border-radius:8px; border-left: 4px solid #8b949e; text-align: center;'><span style='color:#8b949e; font-family:\"Rajdhani\", sans-serif; font-size:18px; letter-spacing:2px;'>[ Belum ada unit berangkat. ]</span></div>", unsafe_allow_html=True)
+    st.markdown("<div style='background-color: var(--bg-surface); padding: 20px; border: 1px solid var(--border-color); border-radius:8px; border-left: 4px solid var(--text-muted); text-align: center;'><span style='color:var(--text-muted); font-family:\"Rajdhani\", sans-serif; font-size:18px; letter-spacing:2px;'>[ Belum ada unit berangkat. ]</span></div>", unsafe_allow_html=True)
 else:
     cols = st.columns(3)
     for index, unit in enumerate(armada_aktif):
         with cols[index % 3]:
-            # Soft Neon Card Layout
-            border_color = "#ff4d6d" if unit['is_overdue'] else "#30363d"
-            accent_border = "#ff4d6d" if unit['is_overdue'] else "#00d2d3" # Variabel di-rename agar relevan
-            shadow_color = "rgba(255, 77, 109, 0.15)" if unit['is_overdue'] else "rgba(0, 210, 211, 0.05)"
+            # 💉 NEXUS PRIME PATCH: Adaptive Variable Theme untuk Kartu Armada
+            border_color = "var(--accent-red)" if unit['is_overdue'] else "var(--border-color)"
+            accent_border = "var(--accent-red)" if unit['is_overdue'] else "var(--accent-cyan)"
             
-            # 💉 NEXUS PRIME PATCH: Transmutasi border-top menjadi border-left dengan ketebalan 4px
-            st.markdown(f"<div style='background-color:#161b22; border:1px solid {border_color}; border-left:4px solid {accent_border}; border-radius:8px; padding:15px; margin-bottom:15px; box-shadow: 0 4px 12px {shadow_color};'>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background-color:var(--bg-surface); border:1px solid {border_color}; border-left:4px solid {accent_border}; border-radius:8px; padding:15px; margin-bottom:15px; box-shadow: var(--shadow-subtle);'>", unsafe_allow_html=True)
             
             if unit['is_overdue']:
                 kelebihan = unit['lama_jalan'] - unit['sla_limit']
@@ -119,22 +133,22 @@ else:
             else:
                 badge_html = f"<div class='badge-normal' style='width:100%; text-align:center;'>⏱️ Durasi Perjalanan: {unit['lama_jalan']} / {unit['sla_limit']} MENIT</div>"
 
+            # Teks warna diubah ke var(--text-primary) agar terbaca saat Light/Dark mode
             st.markdown(f"""
                 <div style="line-height: 1.4; text-align: left; margin-bottom: 12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #30363d; padding-bottom:8px; margin-bottom:8px;">
-                        <span style="font-family:'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing:1px; text-shadow: 0 0 5px rgba(255,255,255,0.2);">{unit['nopol']}</span> 
-                        <!-- UKURAN FONT DRIVER DINAIIKAN KE 15px -->
-                        <span style="font-size: 15px; font-weight: 700; color: #00d2d3; letter-spacing:1px;">[ {unit['driver']} ]</span>
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
+                        <span style="font-family:'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing:1px;">{unit['nopol']}</span> 
+                        <span style="font-size: 15px; font-weight: 700; color: var(--accent-cyan); letter-spacing:1px;">[ {unit['driver']} ]</span>
                     </div>
-                    <div style="font-size: 13px; color: #8b949e; margin-bottom:3px; font-family:'Inter', sans-serif;">RUTE: <span style="color:#ebeef2; font-weight:600;">{unit['rute']}</span></div>
-                    <div style="font-size: 13px; color: #8b949e; font-family:'Inter', sans-serif;">JADWAL: <span style="color:#feca57; font-weight:700; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4);">{unit['jadwal']} WIB</span></div>
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom:3px; font-family:'Inter', sans-serif;">RUTE: <span style="color:var(--text-primary); font-weight:600;">{unit['rute']}</span></div>
+                    <div style="font-size: 13px; color: var(--text-muted); font-family:'Inter', sans-serif;">JADWAL: <span style="color:var(--accent-yellow); font-weight:700;">{unit['jadwal']} WIB</span></div>
                 </div>
                 {badge_html}
             """, unsafe_allow_html=True)
             
             st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
             
-            if st.button("CHECKOUT", key=f"btn_km72_{unit['trip_id']}", width="stretch"):
+            if st.button("CHECKOUT", key=f"btn_km72_{unit['trip_id']}", use_container_width=True):
                 with st.spinner("Mencatat target..."):
                     waktu_wib = get_waktu_wib().strftime("%H:%M")
                     sukses, pesan = safe_update_by_uuid(unit['trip_id'], {"J": waktu_wib})
