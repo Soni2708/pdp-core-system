@@ -40,24 +40,24 @@ c1, c2 = st.columns(2)
 with c1:
     with st.container(border=True):
         st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
-        if st.button("1. PORTAL LINTAS", use_container_width=True):
+        if st.button("1. PORTAL LINTAS", width="stretch"):
             st.switch_page("pages/1_Portal_Lintas.py")
         
     with st.container(border=True):
         st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
-        if st.button("3. PASTEUR DROP POINT", use_container_width=True):
+        if st.button("3. PASTEUR DROP POINT", width="stretch"):
             st.switch_page("pages/3_Pasteur_Drop_Point.py")
 
 with c2:
     with st.container(border=True):
         st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
-        if st.button("2. CHECKPOINT KM72", use_container_width=True):
+        if st.button("2. CHECKPOINT KM72", width="stretch"):
             st.switch_page("pages/2_Checkpoint_KM72.py")
         
     with st.container(border=True):
         st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
         # Logika switch_page try-except multi-nama file milik Anda tetap dipertahankan penuh
-        if st.button("4. LAPORAN", use_container_width=True):
+        if st.button("4. LAPORAN", width="stretch"):
             try:
                 st.switch_page("pages/4_Laporan_Manajemen.py")
             except:
