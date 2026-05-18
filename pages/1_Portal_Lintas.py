@@ -99,7 +99,7 @@ st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
 # 🧑‍🧑‍🧒‍🧒 CARD 2: FORM INPUT ALOKASI PAX TRANSIT
 # ============================================================
 with st.container(border=True):
-    st.markdown("<h4 style='color:var(--accent-yellow); font-family:\"Rajdhani\", sans-serif; font-size:16px; margin-top:0; margin-bottom:15px; letter-spacing:1px;'>🧑‍🧑‍🧒‍🧒 JUMLAH PAX TRANSIT</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:var(--accent-yellow); font-family:\"Rajdhani\", sans-serif; font-size:16px; margin-top:0; margin-bottom:15px; letter-spacing:1px;'>JUMLAH PAX TRANSIT</h4>", unsafe_allow_html=True)
     
     col_mim, col_kopo, col_jtn = st.columns(3)
     with col_mim: 
