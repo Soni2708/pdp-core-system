@@ -181,7 +181,7 @@ with col_kiri:
                         {unit['rute']} <span style="color:#8b949e;">|</span> JAM: <span style="color:#feca57; font-weight:bold;">{unit['jadwal']}</span>
                     </div>
                     <div style="font-size: 14px; color: #ffffff; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
-                        MIM / BB: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JTN: <b style="color:#feca57;">{unit['pax_jtn']}</b>
+                        MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JATINANGOR: <b style="color:#feca57;">{unit['pax_jtn']}</b>
                     </div>
                 </div><hr style="margin:10px 0; border-top: 1px dashed #30363d !important;">
                 """, unsafe_allow_html=True)
@@ -208,7 +208,7 @@ with col_tengah:
                                 OUT KM72: <span style="color:#feca57; font-weight:bold;">{unit['jam_72']}</span>
                             </div>
                             <div style="font-size: 14px; color: #ffffff; background:#0d1117; padding:6px 12px; border-radius:4px; border:1px solid #30363d; display:inline-block; font-weight:600;">
-                                MIM / BB: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JTN: <b style="color:#feca57;">{unit['pax_jtn']}</b>
+                                MIM / BUAHBATU: <b style="color:#feca57;">{unit['pax_mim']}</b> &nbsp;|&nbsp; KOPO: <b style="color:#feca57;">{unit['pax_kopo']}</b> &nbsp;|&nbsp; JATINANGOR: <b style="color:#feca57;">{unit['pax_jtn']}</b>
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -280,7 +280,7 @@ with col_kanan:
     
     with col_b1:
         count_mim = len(grup_tujuan["MIM / BUAHBATU"])
-        if st.button(f"MIM / BB ({count_mim})", use_container_width=True, disabled=(count_mim == 0), key="trg_mim"):
+        if st.button(f"MIM / BUAHBATU ({count_mim})", use_container_width=True, disabled=(count_mim == 0), key="trg_mim"):
             st.session_state.modal_active = True
             render_modal_dispatch("MIM / BUAHBATU")
             
