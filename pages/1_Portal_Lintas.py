@@ -1,5 +1,6 @@
 import streamlit as st
 import uuid
+import base64 # Ditambahkan untuk membaca logo dengan aman
 
 # IMPORT KOMPONEN UI GLOBAL & MESIN DATABASE
 from components.ui_styles import apply_global_cyberpunk_theme, render_cyberpunk_header
@@ -26,25 +27,32 @@ require_auth(module_name="portal", secret_dict_name="users_portal")
 
 # Tombol Logout diletakkan di Sidebar agar UI tengah tetap rapi
 with st.sidebar:
-    st.markdown(f"<h3 style='color:#00d2d3; margin-bottom:15px;'>👤 {st.session_state.get('petugas_portal', 'Petugas').upper()}</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='color:var(--accent-cyan); margin-bottom:15px; font-family:\"Rajdhani\", sans-serif;'>👤 {st.session_state.get('petugas_portal', 'Petugas').upper()}</h3>", unsafe_allow_html=True)
     st.markdown('<div class="btn-logout">', unsafe_allow_html=True)
     if st.button("Logout", use_container_width=True):
         logout_user("portal")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- RENDER LOGO & HEADER ---
-col1, col2, col3 = st.columns([2, 0.8, 2])
-with col2:
-    try: 
-        st.image("assets/logo.png", use_container_width=True)
-    except: 
-        pass
+# ============================================================
+# 🚀 ADAPTIVE BRANDING LOGO (FLEXBOX)
+# ============================================================
+# 💉 NEXUS PRIME REFACTOR: Mencegah logo terpotong dan responsif di semua device
+try:
+    with open("assets/logo.png", "rb") as img_file:
+        img_b64 = base64.b64encode(img_file.read()).decode()
+    st.markdown(f"""
+        <div style='display: flex; justify-content: center; align-items: center; margin-bottom: 15px; width: 100%; padding-top: 10px;'>
+            <img src='data:image/png;base64,{img_b64}' style='max-width: 160px; height: auto; object-fit: contain; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));'>
+        </div>
+    """, unsafe_allow_html=True)
+except FileNotFoundError:
+    pass
 
-render_cyberpunk_header("PORTAL KEBERANGKATAN", "Sistem Integrasi Feeder PDP - Lintas Jabodetabek & Sekitarnya", "#ff0055")
+render_cyberpunk_header("PORTAL KEBERANGKATAN", "Sistem Integrasi Feeder PDP - Lintas Jabodetabek & Sekitarnya", "var(--accent-red)")
 st.divider()
 
 # ============================================================
-# INISIALISASI MESIN RESET STATE
+# INISIALISASI MESIN RESET STATE (LOGIKA ORIGINAL)
 # ============================================================
 if 'kunci_reset' not in st.session_state: st.session_state.kunci_reset = 0
 if 'pesan_sukses' not in st.session_state: st.session_state.pesan_sukses = None
@@ -57,7 +65,7 @@ if st.session_state.pesan_sukses:
 # 📋 CARD 1: FORM VALIDASI DATA UTAMA ARMADA
 # ============================================================
 with st.container(border=True):
-    st.markdown("<h4 style='color:#00d2d3; font-family:\"Rajdhani\", sans-serif; font-size:16px; margin-top:0; margin-bottom:15px; letter-spacing:1px;'>📋 DATA OPERASIONAL</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:var(--accent-cyan); font-family:\"Rajdhani\", sans-serif; font-size:16px; margin-top:0; margin-bottom:15px; letter-spacing:1px;'>📋 DATA OPERASIONAL</h4>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
@@ -67,15 +75,16 @@ with st.container(border=True):
         opsi_jadwal = get_jadwal_dinamis(pilihan_rute) if pilihan_rute != "-- Pilih Rute --" else ["-- Pilih Rute Dulu --"]
         pilihan_jadwal = st.selectbox("🕒 Jadwal Keberangkatan", options=opsi_jadwal, key=f"jadwal_{st.session_state.kunci_reset}")
         
-    # Baris Tambahan untuk Jadwal Ekstra didesain lebih ramping
     if pilihan_rute != "-- Pilih Rute --":
-        st.markdown("<p style='color:#8b949e; font-size:12px; margin-top:-10px; margin-bottom:10px;'>🔒 <i>Menampilkan jadwal terdekat.</i></p>", unsafe_allow_html=True)
+        st.markdown("<p style='color:var(--text-muted); font-size:12px; margin-top:-10px; margin-bottom:10px;'>🔒 <i>Menampilkan jadwal terdekat.</i></p>", unsafe_allow_html=True)
     
     with st.expander("📥 Jadwal tidak ada di daftar? Klik disini"):
         pakai_jadwal_extra = st.checkbox("Gunakan Jadwal Extra", key=f"cek_extra_{st.session_state.kunci_reset}")
         jam_extra = st.time_input("Pilih Jam Keberangkatan", disabled=not pakai_jadwal_extra, key=f"jam_extra_{st.session_state.kunci_reset}")
         if pakai_jadwal_extra: 
             st.caption("✅ Jadwal Extra diaktifkan.")
+
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True) # Spacer tambahan agar form lega
 
     # Input Driver & Nopol diletakkan berdampingan secara simetris
     c_drv, c_npl = st.columns(2)
@@ -90,7 +99,7 @@ st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
 # 🧑‍🧑‍🧒‍🧒 CARD 2: FORM INPUT ALOKASI PAX TRANSIT
 # ============================================================
 with st.container(border=True):
-    st.markdown("<h4 style='color:#feca57; font-family:\"Rajdhani\", sans-serif; font-size:16px; margin-top:0; margin-bottom:15px; letter-spacing:1px;'>🧑‍🧑‍🧒‍🧒 JUMLAH PAX TRANSIT</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:var(--accent-yellow); font-family:\"Rajdhani\", sans-serif; font-size:16px; margin-top:0; margin-bottom:15px; letter-spacing:1px;'>🧑‍🧑‍🧒‍🧒 JUMLAH PAX TRANSIT</h4>", unsafe_allow_html=True)
     
     col_mim, col_kopo, col_jtn = st.columns(3)
     with col_mim: 
@@ -123,12 +132,11 @@ if pakai_jadwal_extra:
 if tombol_terkunci:
     st.warning("⚠️ PENTING: Nihil transit wajib diinput. Pilih Rute, Jadwal, Nama Driver, dan Nopol.")
 
-# Di dalam pages/1_Portal_Lintas.py (Baris ~110)
 
 # ============================================================
 # EKSEKUSI TRANSMISI DATA (ABSOLUTE MAPPING)
 # ============================================================
-# 💉 NEXUS PRIME SURGICAL PATCH: Centering via Balanced Column Matrix (Proporsi Simetris 1:2:1)
+# 💉 NEXUS PRIME SURGICAL PATCH: Centering via Balanced Column Matrix
 col_space_l, col_transmit, col_space_r = st.columns([1, 2, 1])
 
 with col_transmit:
@@ -163,7 +171,7 @@ with col_transmit:
                         del st.session_state[key]
 
                 fetch_mapped_data.clear()
-                st.session_state.pesan_sukses = f"Transmit Sukses. Unit {nopol_reguler.strip()} diBerangkatkan!"
+                st.session_state.pesan_sukses = f"Arsitektur Transmisi Sukses. Armada {nopol_reguler.strip()} resmi mengudara!"
                 st.session_state.kunci_reset += 1
                 st.rerun()
             else:
