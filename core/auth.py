@@ -41,7 +41,7 @@ def require_auth(module_name, secret_dict_name):
                 
                 # Menambahkan sedikit spacer agar form tidak terlalu sesak
                 st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
-                submit_login = st.form_submit_button("Login", use_container_width=True)
+                submit_login = st.form_submit_button("Login", width="stretch")
                 
                 if submit_login:
                     try:
