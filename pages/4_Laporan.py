@@ -59,7 +59,7 @@ with tab1:
     st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
     
     if st.session_state.cache_harian is None:
-        if st.button("UNDUH LAPORAN HARIAN", key="btn_prep_hari", use_container_width=True):
+        if st.button("UNDUH LAPORAN HARIAN", key="btn_prep_hari", width="stretch"):
             with st.spinner("Mengompilasi enkripsi data harian dari Supabase..."):
                 st.session_state.cache_harian = generate_excel_report(tanggal_filter=tgl_pilih)
                 if not st.session_state.cache_harian:
@@ -74,7 +74,7 @@ with tab1:
             data=st.session_state.cache_harian,
             file_name=f"Laporan_Harian_{tgl_pilih.strftime('%Y-%m-%d')}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True,
+            width="stretch",
             type="primary"
         )
 
@@ -103,7 +103,7 @@ with tab2:
         st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
         
         if st.session_state.cache_kustom is None:
-            if st.button("UNDUH LAPORAN MINGGUAN / CUSTOM", key="btn_prep_kustom", use_container_width=True):
+            if st.button("UNDUH LAPORAN MINGGUAN / CUSTOM", key="btn_prep_kustom", width="stretch"):
                 with st.spinner("Memproses sinkronisasi data rentang kustom..."):
                     st.session_state.cache_kustom = generate_excel_report(start_date=start_date, end_date=end_date)
                     if not st.session_state.cache_kustom:
@@ -117,7 +117,7 @@ with tab2:
                 data=st.session_state.cache_kustom,
                 file_name=f"Laporan_Kustom_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True,
+                width="stretch",
                 type="primary"
             )
     else:
@@ -143,7 +143,7 @@ with tab3:
     st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
 
     if st.session_state.cache_bulanan is None:
-        if st.button("UNDUH LAPORAN BULANAN", key="btn_prep_bulan", use_container_width=True):
+        if st.button("UNDUH LAPORAN BULANAN", key="btn_prep_bulan", width="stretch"):
             with st.spinner(f"Mengompilasi data skala besar untuk periode {bln_pilih} {thn_pilih}..."):
                 st.session_state.cache_bulanan = generate_excel_report(bulan_filter=bln_pilih, tahun_filter=str(thn_pilih))
                 if not st.session_state.cache_bulanan:
@@ -157,6 +157,6 @@ with tab3:
             data=st.session_state.cache_bulanan,
             file_name=f"Laporan_Bulanan_{bln_pilih}_{thn_pilih}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True,
+            width="stretch",
             type="primary"
         )
