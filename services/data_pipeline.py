@@ -1,5 +1,13 @@
 from services.engine_kalkulasi import hitung_wt
 
+def _parse_pax(val) -> int:
+    """
+    Helper internal murni untuk memastikan nilai PAX selalu Integer yang aman.
+    Mencegah TypeError dan menghilangkan duplikasi kode kotor (DRY Principle).
+    """
+    v_str = str(val).strip()
+    return int(v_str) if v_str.isdigit() else 0
+
 def proses_kanban_pdp(semua_data, waktu_sekarang):
     hasil = {
         "portal_kiri": [],
@@ -25,14 +33,17 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
         baris_db = row.get('baris_db')
         trip_id = str(row.get('trip_id', ''))
         
-        pax_mim = int(row.get('pax_mim', 0) if str(row.get('pax_mim', '')).isdigit() else 0)
-        pax_kopo = int(row.get('pax_kopo', 0) if str(row.get('pax_kopo', '')).isdigit() else 0)
-        pax_jtn = int(row.get('pax_jtn', 0) if str(row.get('pax_jtn', '')).isdigit() else 0)
+        # 💉 NEXUS PRIME REFACTOR: 
+        # Konversi tipe terpusat, sejajar presisi, tidak ada spasi hantu.
+        pax_mim = _parse_pax(row.get('pax_mim'))
+        pax_kopo = _parse_pax(row.get('pax_kopo'))
+        pax_jtn = _parse_pax(row.get('pax_jtn'))
         
         jam_out_mim = str(row.get('jam_out_mim', ''))
         jam_out_kopo = str(row.get('jam_out_kopo', ''))
         jam_out_jtn = str(row.get('jam_out_jtn', ''))
 
+        # Logika Bisnis: Hanya proses armada yang sedang aktif
         if status != "IN TRANSIT":
             continue
         
@@ -43,8 +54,12 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
         semua_berangkat = False 
         ada_pax = False 
 
-        # DISTRIBUSI KANBAN
+        # -----------------------------------------------------------------
+        # DISTRIBUSI KANBAN (Logika Inti Dipertahankan - JANGAN DISENTUH)
+        # -----------------------------------------------------------------
+        
         if jam_72 == "" and jam_tiba_pdp == "":
+            # 1. Armada baru berangkat dari Portal Lintas
             hasil["portal_kiri"].append({
                 "nopol": nopol, "driver": driver, "rute": rute, "jadwal": jadwal,
                 "pax_mim": pax_mim, "pax_kopo": pax_kopo, "pax_jtn": pax_jtn,
@@ -53,15 +68,17 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
             })
             
         elif jam_72 != "" and jam_tiba_pdp == "":
+            # 2. Armada sudah keluar KM72, sedang meluncur ke PDP
             hasil["km72_tengah"].append({
                 "nopol": nopol, "driver": driver, "rute": rute, "jadwal": jadwal,
                 "pax_mim": pax_mim, "pax_kopo": pax_kopo, "pax_jtn": pax_jtn,
                 "baris_db": baris_db,
                 "trip_id": trip_id,
-                "jam_72": jam_72  # <--- INI DIA TERSANGKANYA BRO! UDAH GUE TAMBAHIN!
+                "jam_72": jam_72
             })
             
         elif jam_tiba_pdp != "":
+            # 3. Armada sudah tiba di Pasteur Drop Point (PDP)
             semua_berangkat = True 
             
             rutes = [
@@ -73,6 +90,7 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
             for tj, pax_count, jam_out in rutes:
                 if pax_count > 0:
                     ada_pax = True
+                    # Jika ada penumpang tujuan tersebut yang belum berangkat (jam_out kosong)
                     if jam_out == "":
                         semua_berangkat = False 
                         wt = hitung_wt(jam_tiba_pdp, waktu_sekarang)
@@ -80,22 +98,28 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
                         # Pengaturan Badge Warna Soft Neon Cyberpunk
                         badge = f"<span style='color:#ff4757; font-weight:bold; text-shadow: 0 0 5px rgba(255,71,87,0.4);'>🚨 {wt} menit</span>" if wt >= 30 else f"<span style='color:#feca57; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4); font-weight:700;'>⏳ {wt} menit</span>"
                         
-                        pax_info.append(f"<li>{tj}: <b style='color:#feca57;'>{pax_count} Pax</b> {badge}</li>")
+                        # 💉 CYBERNETIC PATCH: Buang <li>, gunakan block modern
+                        pax_info.append(f"<div style='margin-bottom: 4px; border-left: 2px solid #30363d; padding-left: 8px;'><span style='color:#8b949e;'>{tj}:</span> <b style='color:#ffffff;'>{pax_count} PAX</b> &nbsp; {badge}</div>")
+                        
                         hasil["grup_tujuan"][tj].append({"label": label_armada, "baris_db": baris_db, "trip_id": trip_id, "jam_tiba": jam_tiba_pdp})
                         hasil["total_pax"][tj] += pax_count
             
+            # Jika masih ada yang mengantre, masukkan ke panel Monitor Antrean
             if ada_pax and pax_info:
                 hasil["monitor_antrean"].append({
-                    "label": label_armada,
+                    "label": label_armada, 
+                    "rute": rute,          
+                    "nopol": nopol,        
                     "driver": driver,
                     "tiba": jam_tiba_pdp,
                     "html": "".join(pax_info)
                 })
             
+            # Jika semua tujuan sudah diberangkatkan atau memang tidak membawa PAX sedari awal
             if semua_berangkat or not ada_pax:
                 hasil["auto_selesai_updates"].append({
-                    "baris": baris_db,
-                    "updates": {"H": "SELESAI"}
+                    "trip_id": trip_id,         
+                    "updates": {"I": "SELESAI"} 
                 })
 
     return hasil
