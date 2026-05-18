@@ -280,7 +280,7 @@ with col_kanan:
     
     with col_b1:
         count_mim = len(grup_tujuan["MIM / BUAHBATU"])
-        if st.button(f"MIM / BUAHBATU ({count_mim})", use_container_width=True, disabled=(count_mim == 0), key="trg_mim"):
+        if st.button(f"MIM / BUBAT ({count_mim})", use_container_width=True, disabled=(count_mim == 0), key="trg_mim"):
             st.session_state.modal_active = True
             render_modal_dispatch("MIM / BUAHBATU")
             
