@@ -24,7 +24,7 @@ except FileNotFoundError:
     pass
 
 # Merender judul utama dengan teks asli milik Anda
-render_cyberpunk_header("TRANSIT HUB CORE SYSTEM", "PDP Mobility Dashboard - By : Soni Abbasy", "var(--accent-cyan)")
+render_cyberpunk_header("TRANSIT HUB CORE SYSTEM", "PDP Mobility Dashboard", "var(--accent-cyan)")
 
 st.divider()
 
