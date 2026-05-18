@@ -171,7 +171,7 @@ with col_transmit:
                         del st.session_state[key]
 
                 fetch_mapped_data.clear()
-                st.session_state.pesan_sukses = f"Arsitektur Transmisi Sukses. Armada {nopol_reguler.strip()} resmi mengudara!"
+                st.session_state.pesan_sukses = f"Transmit Sukses. Unit {nopol_reguler.strip()} diberangkatkan!"
                 st.session_state.kunci_reset += 1
                 st.rerun()
             else:
