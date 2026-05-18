@@ -85,7 +85,7 @@ def render_modal_dispatch(tujuan_target):
         
     st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
     
-    if st.button(f"BERANGKATKAN FEEDER {tujuan_target}", use_container_width=True, type="primary"):
+    if st.button(f"BERANGKATKAN FEEDER {tujuan_target}", width="stretch", type="primary"):
         if not pilihan_massal or not drv_f.strip() or not nopol_f.strip():
             st.error("⚠️ Validasi Gagal: Lengkapi Nama Pengemudi, Nomor Polisi, dan minimal satu unit pilihan!")
         else:
@@ -147,14 +147,14 @@ with col_judul:
 
 with col_sync:
     st.markdown('<div class="btn-sync">', unsafe_allow_html=True)
-    if st.button("🔄 Refresh", use_container_width=True): 
+    if st.button("🔄 Refresh", width="stretch"): 
         fetch_mapped_data.clear()
         st.rerun()            
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_logout:
     st.markdown('<div class="btn-logout">', unsafe_allow_html=True)
-    if st.button("Logout", use_container_width=True): 
+    if st.button("Logout", width="stretch"): 
         logout_user("pdp")           
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -224,7 +224,7 @@ with col_tengah:
                         """, unsafe_allow_html=True)
                     with c_tombol:
                         st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
-                        if st.button("TIBA", key=f"tiba_{unit['trip_id']}", use_container_width=True):
+                        if st.button("TIBA", key=f"tiba_{unit['trip_id']}", width="stretch"):
                             with st.spinner("Proses..."):
                                 waktu_tiba = waktu_sekarang.strftime("%H:%M")
                                 sukses, pesan = safe_update_by_uuid(unit['trip_id'], {"K": waktu_tiba})
@@ -266,19 +266,19 @@ with col_kanan:
     
     with col_b1:
         count_mim = len(grup_tujuan["MIM / BUAHBATU"])
-        if st.button(f"MIM/BB ({count_mim})", use_container_width=True, disabled=(count_mim == 0), key="trg_mim"):
+        if st.button(f"MIM/BB ({count_mim})", width="stretch", disabled=(count_mim == 0), key="trg_mim"):
             st.session_state.modal_active = True
             render_modal_dispatch("MIM / BUAHBATU")
             
     with col_b2:
         count_kopo = len(grup_tujuan["KOPO"])
-        if st.button(f"KOPO ({count_kopo})", use_container_width=True, disabled=(count_kopo == 0), key="trg_kop"):
+        if st.button(f"KOPO ({count_kopo})", width="stretch", disabled=(count_kopo == 0), key="trg_kop"):
             st.session_state.modal_active = True
             render_modal_dispatch("KOPO")
             
     with col_b3:
         count_jtn = len(grup_tujuan["JATINANGOR"])
-        if st.button(f"JATINANGOR ({count_jtn})", use_container_width=True, disabled=(count_jtn == 0), key="trg_jtn"):
+        if st.button(f"JATINANGOR ({count_jtn})", width="stretch", disabled=(count_jtn == 0), key="trg_jtn"):
             st.session_state.modal_active = True
             render_modal_dispatch("JATINANGOR")
             
