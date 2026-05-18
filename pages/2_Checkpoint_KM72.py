@@ -90,14 +90,14 @@ with col_judul:
 
 with col_sync:
     st.markdown('<div class="btn-sync">', unsafe_allow_html=True) # Margin manual dihapus
-    if st.button("🔄 Refresh", use_container_width=True): 
+    if st.button("🔄 Refresh", width="stretch"): 
         fetch_mapped_data.clear() 
         st.rerun() 
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col_logout:
     st.markdown('<div class="btn-logout">', unsafe_allow_html=True) # Margin manual dihapus
-    if st.button("Logout", use_container_width=True): logout_user("km72")           
+    if st.button("Logout", width="stretch"): logout_user("km72")           
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.divider()
@@ -148,7 +148,7 @@ else:
             
             st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
             
-            if st.button("CHECKOUT", key=f"btn_km72_{unit['trip_id']}", use_container_width=True):
+            if st.button("CHECKOUT", key=f"btn_km72_{unit['trip_id']}", width="stretch"):
                 with st.spinner("Mencatat target..."):
                     waktu_wib = get_waktu_wib().strftime("%H:%M")
                     sukses, pesan = safe_update_by_uuid(unit['trip_id'], {"J": waktu_wib})
