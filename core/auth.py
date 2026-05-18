@@ -20,9 +20,16 @@ def require_auth(module_name, secret_dict_name):
     if st.session_state[akses_key]:
         return True
 
-    # --- UI RENDER: FORM LOGIN ---
-    st.markdown("<br><br><h2 style='text-align:center; color:#00ffcc;'>🔒 SYSTEM LOGIN</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align:center; color:#ffffff;'>Akses terbatas. Silakan masuk untuk mengakses modul <b>{module_name.upper()}</b>.</p>", unsafe_allow_html=True)
+    # --- UI RENDER: FORM LOGIN (ADAPTIVE THEME FIX) ---
+    # 💉 NEXUS PRIME REFACTOR: Mengganti warna statis dengan CSS Variables (var(--...))
+    st.markdown(
+        "<br><br><h2 style='text-align:center; color:var(--accent-cyan); font-family:\"Rajdhani\", sans-serif; letter-spacing: 2px;'>🔒 SYSTEM LOGIN</h2>", 
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"<p style='text-align:center; color:var(--text-muted); font-family:\"Inter\", sans-serif; font-size:14px; margin-bottom: 25px;'>Akses terbatas. Silakan masuk untuk mengakses modul <b style='color:var(--text-primary);'>{module_name.upper()}</b>.</p>", 
+        unsafe_allow_html=True
+    )
     
     with st.container():
         col_log1, col_log2, col_log3 = st.columns([1, 1.5, 1])
@@ -31,7 +38,10 @@ def require_auth(module_name, secret_dict_name):
                 # FIX: Input diubah ke .lower() agar kebal terhadap kesalahan huruf besar/kecil
                 input_id = st.text_input("User ID").lower().strip()
                 input_pass = st.text_input("Password", type="password").strip()
-                submit_login = st.form_submit_button("Login")
+                
+                # Menambahkan sedikit spacer agar form tidak terlalu sesak
+                st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+                submit_login = st.form_submit_button("Login", use_container_width=True)
                 
                 if submit_login:
                     try:
