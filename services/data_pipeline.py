@@ -33,7 +33,6 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
         baris_db = row.get('baris_db')
         trip_id = str(row.get('trip_id', ''))
         
-        # 💉 NEXUS PRIME REFACTOR: 
         # Konversi tipe terpusat, sejajar presisi, tidak ada spasi hantu.
         pax_mim = _parse_pax(row.get('pax_mim'))
         pax_kopo = _parse_pax(row.get('pax_kopo'))
@@ -95,11 +94,10 @@ def proses_kanban_pdp(semua_data, waktu_sekarang):
                         semua_berangkat = False 
                         wt = hitung_wt(jam_tiba_pdp, waktu_sekarang)
                         
-                        # Pengaturan Badge Warna Soft Neon Cyberpunk
-                        badge = f"<span style='color:#ff4757; font-weight:bold; text-shadow: 0 0 5px rgba(255,71,87,0.4);'>🚨 {wt} menit</span>" if wt >= 30 else f"<span style='color:#feca57; text-shadow: 0 0 5px rgba(254, 202, 87, 0.4); font-weight:700;'>⏳ {wt} menit</span>"
+                        # 💉 NEXUS PRIME REFACTOR: Menggunakan Adaptive CSS Variables (var(--accent-red), var(--text-primary), dll)
+                        badge = f"<span style='color:var(--accent-red); font-weight:bold;'>🚨 {wt} menit</span>" if wt >= 30 else f"<span style='color:var(--accent-yellow); font-weight:700;'>⏱️ {wt} menit</span>"
                         
-                        # 💉 CYBERNETIC PATCH: Buang <li>, gunakan block modern
-                        pax_info.append(f"<div style='margin-bottom: 4px; border-left: 2px solid #30363d; padding-left: 8px;'><span style='color:#8b949e;'>{tj}:</span> <b style='color:#ffffff;'>{pax_count} PAX</b> &nbsp; {badge}</div>")
+                        pax_info.append(f"<div style='margin-bottom: 4px; border-left: 2px solid var(--border-color); padding-left: 8px;'><span style='color:var(--text-muted);'>{tj}:</span> <b style='color:var(--text-primary);'>{pax_count} PAX</b> &nbsp; {badge}</div>")
                         
                         hasil["grup_tujuan"][tj].append({"label": label_armada, "baris_db": baris_db, "trip_id": trip_id, "jam_tiba": jam_tiba_pdp})
                         hasil["total_pax"][tj] += pax_count
