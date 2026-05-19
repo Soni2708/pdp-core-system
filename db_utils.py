@@ -94,7 +94,7 @@ def safe_append_reguler(data_baru):
 # ============================================================
 # 🚨 READ: PURE LIVE DATA (SUPABASE V8)
 # ============================================================
-@st.cache_data(ttl=2)
+@st.cache_data(ttl=15)
 def fetch_mapped_data(is_laporan=False): # 💉 Parameter pemisah jalur
     try:
         supabase = get_supabase_client()
