@@ -1,38 +1,66 @@
-from datetime import datetime
-from db_utils import get_waktu_wib, fetch_master_config
+import logging
+from datetime import datetime, timedelta
+from db_utils import fetch_master_config, get_waktu_wib
 
-def get_semua_rute():
-    """Mengembalikan list semua rute yang terdaftar di Google Sheets."""
-    config = fetch_master_config()
-    rute_aktif = list(config["JADWAL"].keys())
-    # Sortir alfabetis agar UI rapi
-    return ["-- Pilih Rute --"] + sorted(rute_aktif)
+log = logging.getLogger("JADWAL_SERVICE")
 
-def get_jadwal_dinamis(pilihan_rute):
+def get_semua_rute() -> list:
+    """Menarik daftar rute murni dari Supabase."""
+    try:
+        config = fetch_master_config()
+        if not config or "JADWAL" not in config:
+            return ["-- Pilih Rute --"]
+            
+        rute_list = list(config["JADWAL"].keys())
+        return ["-- Pilih Rute --"] + sorted(rute_list)
+    except Exception as e:
+        log.error(f"Error saat memuat list rute: {e}")
+        return ["-- Pilih Rute --"]
+
+def get_jadwal_dinamis(rute_pilihan: str) -> list:
     """
-    ENGINE PAGAR WAKTU DINAMIS
-    Membaca jadwal dari database, lalu memfilter 30 menit ke belakang & 60 menit ke depan.
+    Menarik jadwal dari Supabase dan memfilternya dengan Time-Window Strict:
+    Hanya memunculkan jadwal yang rentangnya: [Waktu Sekarang - 15 Menit] s.d [Waktu Sekarang + 60 Menit]
     """
-    config = fetch_master_config()
-    
-    if pilihan_rute not in config["JADWAL"]:
+    if not rute_pilihan or rute_pilihan == "-- Pilih Rute --":
         return ["-- Pilih Rute Dulu --"]
-
-    waktu_sekarang = get_waktu_wib()
-    jadwal_tersedia = []
-    
-    for jw in config["JADWAL"][pilihan_rute]:
-        try:
-            jam_dt = datetime.strptime(jw, "%H:%M")
-            jam_real = waktu_sekarang.replace(hour=jam_dt.hour, minute=jam_dt.minute, second=0, microsecond=0)
+        
+    try:
+        config = fetch_master_config()
+        jadwal_list = config["JADWAL"].get(rute_pilihan, [])
+        
+        if not jadwal_list:
+            # Jika rute memang tidak memiliki jadwal baku (contoh kasus dinamis)
+            return ["-- Menunggu Jadwal Berikutnya --"]
             
-            selisih_menit = (jam_real - waktu_sekarang).total_seconds() / 60
+        waktu_sekarang = get_waktu_wib()
+        jadwal_aktif = []
+        
+        for jam_str in jadwal_list:
+            try:
+                # Parsing string "07:00" menjadi objek jam
+                jam, menit = map(int, jam_str.split(':'))
+                jadwal_dt = waktu_sekarang.replace(hour=jam, minute=menit, second=0, microsecond=0)
+                
+                # Hitung selisih waktu dalam menit
+                selisih_menit = (jadwal_dt - waktu_sekarang).total_seconds() / 60
+                
+                # 🛡️ ENGINE VALIDASI WAKTU (STRICT TIMING)
+                # selisih >= -15 : Otomatis menghilangkan jadwal yang sudah lewat lebih dari 15 menit
+                # selisih <= 60  : Memblokir jadwal yang masih lebih dari 1 jam di masa depan
+                if -15 <= selisih_menit <= 60:
+                    jadwal_aktif.append(jam_str)
+                    
+            except Exception as e:
+                log.warning(f"Format jam tidak valid dilewati: {jam_str}")
+                continue 
+        
+        # Jika semua jadwal terkunci (karena belum waktunya / sudah terlewat semua)
+        if not jadwal_aktif:
+            return ["-- Tidak ada jadwal aktif terdekat --"]
             
-            if -30 <= selisih_menit <= 60:
-                jadwal_tersedia.append(jw)
-        except Exception:
-            pass
-    
-    if not jadwal_tersedia:
-        return ["-- Menunggu Jadwal Berikutnya --"]
-    return ["-- Pilih Jadwal --"] + jadwal_tersedia
+        return ["-- Pilih Jadwal --"] + jadwal_aktif
+        
+    except Exception as e:
+        log.error(f"Error saat memuat jadwal dinamis: {e}")
+        return ["-- Pilih Jadwal --"]
