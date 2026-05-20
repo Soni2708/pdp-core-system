@@ -1,114 +1,73 @@
-import gspread
 import streamlit as st
+import pandas as pd
 from datetime import datetime
 import pytz
-import time
-import random
-from functools import wraps
 from supabase import create_client, Client
-import pandas as pd
 from io import BytesIO
+import logging
+import html
 
-def get_waktu_wib():
+# Setup Logger Internal
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("DB_UTILS")
+
+def get_waktu_wib() -> datetime:
+    """Mengembalikan objek datetime sesuai zona waktu Jakarta."""
     return datetime.now(pytz.timezone('Asia/Jakarta'))
 
 # ============================================================
-# 🔑 KONEKSI DATABASE (SUPABASE UNTUK LIVE & GSHEETS UNTUK CONFIG)
+# 🔑 CORE CONNECTIONS (SINGLETON PATTERN)
 # ============================================================
 @st.cache_resource
 def get_supabase_client() -> Client:
+    """Singleton pattern untuk koneksi Supabase agar tidak memicu memory leak."""
     try:
         url = st.secrets["supabase"]["url"]
         key = st.secrets["supabase"]["key"]
         return create_client(url, key)
+    except KeyError as e:
+        st.error(f"FATAL SYSTEM ERROR: Kunci {e} hilang dari konfigurasi secrets!")
+        st.stop()
     except Exception as e:
-        st.error(f"FATAL ERROR: Kunci Supabase Hilang! {e}")
+        st.error(f"Koneksi Database Terputus: {e}")
         st.stop()
 
-@st.cache_resource(ttl=3600)
-def get_gspread_client():
-    # TETAP DIPAKAI KHUSUS UNTUK MASTER CONFIG JADWAL
-    try:
-        kredensial = dict(st.secrets["connections"]["gsheets"])
-        return gspread.service_account_from_dict(kredensial)
-    except Exception as e:
-        st.error(f"Gagal memuat kredensial Google: {e}")
-        return None
-
 # ============================================================
-# ⚙️ MAPPING AJAIB: MENGUBAH ALAMAT EXCEL JADI SUPABASE
+# 🎯 WRITE: TRANSACTION ENGINE
 # ============================================================
-COL_MAP = {
-    "A": "timestamp",        "N": "mim_bbt_out",
-    "B": "rute",             "O": "wt_mim_bbt",
-    "C": "jadwal",           "P": "driver_kopo",
-    "D": "driver_reguler",   "Q": "nopol_kopo",
-    "E": "nopol",            "R": "kopo_out",
-    "F": "pax_mim_bbt",      "S": "wt_kopo",
-    "G": "pax_kopo",         "T": "driver_jtn",
-    "H": "pax_jtn",          "U": "nopol_jtn",
-    "I": "status",           "V": "jtn_out",
-    "J": "jam_keluar_km72",  "W": "wt_jtn",
-    "K": "jam_tiba_pdp",     "X": "keterangan",
-    "L": "driver_mim_buahbatu",
-    "M": "nopol_mim_buahbatu", "Z": "trip_id"
-}
-
-def clean_pax(val):
-    val_clean = str(val).strip()
-    return val_clean if val_clean.isdigit() else "0"
-
-def gspread_retry(max_retries=4, base_delay=1.0):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            try: return func(*args, **kwargs)
-            except Exception as e: return False, f"System Error: {str(e)}"
-        return wrapper
-    return decorator
-
-# ============================================================
-# 🎯 WRITE: ENGINE INSERTION (SUPABASE V8)
-# ============================================================
-def safe_append_reguler(data_baru):
-    """ Menembak data baru langsung ke PostgreSQL """
+def safe_append_reguler(payload: dict) -> tuple[bool, str]:
+    """Insert data keberangkatan reguler ke tabel operasional_pdp Supabase."""
     try:
         supabase = get_supabase_client()
-        payload = {
-            "timestamp": str(data_baru[0]),
-            "rute": str(data_baru[1]),
-            "jadwal": str(data_baru[2]),
-            "driver_reguler": str(data_baru[3]),
-            "nopol": str(data_baru[4]),
-            "pax_mim_bbt": int(data_baru[5]) if str(data_baru[5]).isdigit() else 0,
-            "pax_kopo": int(data_baru[6]) if str(data_baru[6]).isdigit() else 0,
-            "pax_jtn": int(data_baru[7]) if str(data_baru[7]).isdigit() else 0,
-            "status": str(data_baru[8]),
-            "trip_id": str(data_baru[25])  # Kolom Z
-        }
         supabase.table("operasional_pdp").insert(payload).execute()
         return True, "Transmisi Sukses"
     except Exception as e:
-        return False, f"Supabase Insert Error: {str(e)}"
+        log.error(f"Supabase Insert Error: {e}")
+        return False, f"Database Error: {str(e)}"
 
 # ============================================================
-# 🚨 READ: PURE LIVE DATA (SUPABASE V8)
+# 🚨 READ: OPTIMIZED QUERY PIPELINE (NEXUS INTEGRATION)
 # ============================================================
 @st.cache_data(ttl=15)
-def fetch_mapped_data(is_laporan=False): # 💉 Parameter pemisah jalur
+def fetch_mapped_data(is_laporan: bool = False) -> list:
+    """
+    Menarik data live dari Supabase dengan nama fungsi asli 
+    agar tidak merusak halaman KM72, PDP, dan Laporan.
+    """
     try:
         supabase = get_supabase_client()
-        base_query = supabase.table("operasional_pdp").select("*")
+        query = supabase.table("operasional_pdp").select("*")
         
-        # 💉 Filter presisi level database (Cloud architecture)
         if not is_laporan:
-            res = base_query.eq("status", "IN TRANSIT").order("id", desc=False).execute()
+            # Filter ketat hanya data yang berjalan untuk live radar & kanban
+            res = query.eq("status", "IN TRANSIT").order("jadwal", desc=False).execute()
         else:
-            res = base_query.order("id", desc=False).execute()
-        
-        def safe_str(val):
-            if val is None: return ""
-            return str(val).strip()
+            # Tarik semua data khusus untuk kompilasi modul Laporan
+            res = query.order("id", desc=False).execute()
+
+        def safe_str(val): 
+            # 🛡️ ANTI-XSS INJECTION: Membersihkan string dari script jahat
+            return html.escape(str(val).strip()) if val is not None else ""
 
         mapped_data = []
         for row in res.data:
@@ -145,141 +104,145 @@ def fetch_mapped_data(is_laporan=False): # 💉 Parameter pemisah jalur
                 "wt_jtn": safe_str(row.get("wt_jtn")),
                 
                 "keterangan": safe_str(row.get("keterangan")),
-                "trip_id": safe_str(row.get("trip_id")) 
+                "trip_id": safe_str(row.get("trip_id"))
             })
             
-        # 👇 MESIN SORTIR DATA OPERASIONAL
-        mapped_data = sorted(mapped_data, key=lambda x: x['jadwal'])
-        
         return mapped_data
     except Exception as e:
-        # 💉 NEXUS PRIME PATCH: Gunakan Toast elegan dan kembalikan None agar UI Fallback aktif
-        st.toast(f"Koneksi Core Data Terputus: {e}", icon="🚨")
-        return None
+        log.error(f"Supabase Fetch Error: {e}")
+        return []
 
 # ============================================================
-# 🛡️ UPDATE: ENGINE PRESISI BERBASIS UUID & MAPPING
+# 🛡️ UPDATE: PRECISION ENGINE
 # ============================================================
-def safe_update_by_uuid(trip_id, updates_dict):
+def safe_update_by_uuid(trip_id: str, updates_dict: dict) -> tuple[bool, str]:
+    """Update single record di Supabase berdasarkan Trip ID."""
+    if not updates_dict:
+        return False, "Payload update kosong."
+        
     try:
         supabase = get_supabase_client()
-        payload = {COL_MAP[col]: val for col, val in updates_dict.items() if col in COL_MAP}
-        if payload: supabase.table("operasional_pdp").update(payload).eq("trip_id", trip_id).execute()
-        return True, "Update Presisi Sukses"
-    except Exception as e: return False, str(e)
+        supabase.table("operasional_pdp").update(updates_dict).eq("trip_id", trip_id).execute()
+        return True, "Update Database Sukses"
+    except Exception as e: 
+        log.error(f"Update failed for {trip_id}: {e}")
+        return False, str(e)
 
-def execute_batch_update_by_uuid(uuid_updates):
-    """
-    Eksekutor pembaruan massal berbasis UUID dengan arsitektur fault-tolerance.
-    Kegagalan pada satu item tidak akan membatalkan eksekusi item lainnya dalam antrean.
-    """
+def execute_batch_update_by_uuid(uuid_updates: list) -> tuple[bool, str]:
+    """Batch Update massal di Supabase dengan arsitektur Fault-Tolerant."""
+    if not uuid_updates:
+        return True, "Tidak ada data untuk diupdate."
+        
     supabase = get_supabase_client()
-    errors = []
+    error_count = 0
+    last_error = ""
     
     for item in uuid_updates:
-        try:
-            payload = {COL_MAP[col]: val for col, val in item["updates"].items() if col in COL_MAP}
-            if payload: 
-                supabase.table("operasional_pdp").update(payload).eq("trip_id", item["trip_id"]).execute()
-        except Exception as e:
-            # 💉 NEXUS PRIME PATCH: Isolasi error per item ke dalam list, pertahankan loop berjalan
-            errors.append(f"Gagal UUID {item['trip_id'][:6]}: {str(e)}")
-            
-    if errors:
-        return False, " | ".join(errors)
+        if item.get("updates"):
+            try:
+                # 🛡️ ARCHITECT FIX: Try-Except kini dipindah ke DALAM loop.
+                # Jika armada ke-2 gagal sinyal, armada ke-3 dkk akan TETAP jalan!
+                supabase.table("operasional_pdp").update(item["updates"]).eq("trip_id", item["trip_id"]).execute()
+            except Exception as e: 
+                log.error(f"Batch update failed for {item.get('trip_id')}: {e}")
+                error_count += 1
+                last_error = str(e)
+                
+    if error_count > 0:
+        return False, f"Gagal mengupdate {error_count} armada karena jaringan. Error: {last_error}"
+        
     return True, "Batch Update Massal Sukses"
 
-def execute_batch_update(payloads):
-    """ Penerjemah Range Excel ke ID Database secara transparan """
-    try:
-        supabase = get_supabase_client()
-        for p in payloads:
-            range_str = p.get('range', '')
-            if not range_str: continue
-            
-            col_letter, db_id = range_str[0].upper(), int(range_str[1:])
-            val = p['values'][0][0]
-            
-            if col_letter in COL_MAP:
-                supabase.table("operasional_pdp").update({COL_MAP[col_letter]: val}).eq("id", db_id).execute()
-        return True, "Update Batch Sukses"
-    except Exception as e: return False, str(e)
-
 # ============================================================
-# ⚙️ DYNAMIC CONFIGURATION ENGINE (TETAP PAKAI GSHEETS)
+# ⚙️ DYNAMIC CONFIGURATION ENGINE (100% SUPABASE)
 # ============================================================
 @st.cache_data(ttl=3600)
-def fetch_master_config():
+def fetch_master_config() -> dict:
+    """Menarik konfigurasi rute dan jadwal langsung dari Supabase master_rute."""
     try:
-        gc = get_gspread_client()
-        sheet = gc.open("Trial_Data_Transit").worksheet("MASTER_CONFIG")
-        raw_data = sheet.get_all_values()
+        supabase = get_supabase_client()
+        res = supabase.table("master_rute").select("*").execute()
         
         config = {"SLA": {}, "JADWAL": {}}
-        for row in raw_data[1:]: 
-            if len(row) >= 3:
-                kat, rute, val = str(row[0]).strip().upper(), str(row[1]).strip().upper(), str(row[2]).strip()
-                if kat == "SLA": config["SLA"][rute] = int(val) if val.isdigit() else 150
-                elif kat == "JADWAL": config["JADWAL"][rute] = [j.strip() for j in val.split(",")]
+        for row in res.data:
+            rute = str(row.get("rute")).strip().upper()
+            sla = int(row.get("sla_pdp") or 30)
+            jadwal_raw = str(row.get("jadwal") or "")
+            
+            config["SLA"][rute] = sla
+            if jadwal_raw:
+                config["JADWAL"][rute] = [j.strip() for j in jadwal_raw.split(",") if j.strip()]
+            else:
+                config["JADWAL"][rute] = []
+                
         return config
-    except Exception as e: return {"SLA": {}, "JADWAL": {}}
+    except Exception as e: 
+        log.error(f"Gagal memuat master config dari Supabase: {e}")
+        return {"SLA": {}, "JADWAL": {}}
 
 # ============================================================
-# 📊 EXPORT ENGINE: CETAK LAPORAN (HARIAN, BULANAN, MINGGUAN)
+# 📊 EXPORT ENGINE (MEMORY EFFICIENT)
 # ============================================================
 def generate_excel_report(tanggal_filter=None, bulan_filter=None, tahun_filter=None, start_date=None, end_date=None):
+    """Engine penarik data laporan manajemen."""
     try:
-        # Buka data historis khusus laporan
-        data = fetch_mapped_data(is_laporan=True) 
-        if not data: return None
+        supabase = get_supabase_client()
+        query = supabase.table("operasional_pdp").select("*")
         
-        df = pd.DataFrame(data)
-        
-        # 🗓️ LOGIKA FILTER HARIAN
         if tanggal_filter:
-            tgl_1 = tanggal_filter.strftime("%d-%b-%Y")
-            tgl_2 = tanggal_filter.strftime("%Y-%m-%d")
-            mask = df['waktu_input'].str.contains(tgl_1, case=False, na=False) | \
-                   df['waktu_input'].str.contains(tgl_2, case=False, na=False)
-            df = df[mask]
-            
-        # 📅 LOGIKA FILTER BULANAN
+            tgl_str = tanggal_filter.strftime("%d-%b-%Y")
+            res = query.ilike("timestamp", f"%{tgl_str}%").execute()
         elif bulan_filter and tahun_filter:
-            bulan_str_1 = f"{bulan_filter}-{tahun_filter}" 
-            from datetime import datetime
-            bulan_str_2 = f"{tahun_filter}-{datetime.strptime(bulan_filter, '%b').strftime('%m')}" 
-            
-            mask = df['waktu_input'].str.contains(bulan_str_1, case=False, na=False) | \
-                   df['waktu_input'].str.contains(bulan_str_2, case=False, na=False)
-            df = df[mask]
-            
-        # 📆 LOGIKA FILTER MINGGUAN / RENTANG WAKTU
+            bln_str = f"{bulan_filter}-{tahun_filter}"
+            res = query.ilike("timestamp", f"%{bln_str}%").execute()
         elif start_date and end_date:
-            df['tanggal_asli'] = pd.to_datetime(df['waktu_input'], errors='coerce').dt.date
+            res = query.order("id", desc=False).execute()
+        else:
+            return None
+            
+        if not res.data: 
+            return None
+        
+        df = pd.DataFrame(res.data)
+        
+        if start_date and end_date:
+            df['tanggal_asli'] = pd.to_datetime(df['timestamp'], errors='coerce').dt.date
             mask = (df['tanggal_asli'] >= start_date) & (df['tanggal_asli'] <= end_date)
-            df = df[mask]
-            df = df.drop(columns=['tanggal_asli'])
+            df = df[mask].drop(columns=['tanggal_asli'])
 
-        if df.empty: return None
+        if df.empty: 
+            return None
         
         kolom_rapi = [
-            "waktu_input", "trip_id", "rute", "jadwal", "nopol", "driver", 
-            "status", "jam_72", "jam_tiba_pdp", 
-            "pax_mim", "pax_kopo", "pax_jtn",
-            "driver_mim_bbt", "nopol_mim_bbt", "jam_out_mim", "wt_mim",
-            "driver_kopo", "nopol_kopo", "jam_out_kopo", "wt_kopo",
-            "driver_jtn", "nopol_jtn", "jam_out_jtn", "wt_jtn",
+            "timestamp", "trip_id", "rute", "jadwal", "nopol", "driver_reguler", 
+            "status", "jam_keluar_km72", "jam_tiba_pdp", 
+            "pax_mim_bbt", "pax_kopo", "pax_jtn",
+            "driver_mim_buahbatu", "nopol_mim_buahbatu", "mim_bbt_out", "wt_mim_bbt",
+            "driver_kopo", "nopol_kopo", "kopo_out", "wt_kopo",
+            "driver_jtn", "nopol_jtn", "jtn_out", "wt_jtn",
             "keterangan"
         ]
         
-        kolom_final = [k for k in kolom_rapi if k in df.columns]
-        df = df[kolom_final]
+        df = df[[k for k in kolom_rapi if k in df.columns]]
+        rename_map = {
+            "timestamp": "Waktu Input", "driver_reguler": "Driver Reguler", "status": "Status",
+            "jam_keluar_km72": "Jam Out KM72", "jam_tiba_pdp": "Jam Tiba PDP",
+            "pax_mim_bbt": "Pax MIM", "pax_kopo": "Pax Kopo", "pax_jtn": "Pax Jatinangor",
+            "driver_mim_buahbatu": "Driver Feeder MIM", "nopol_mim_buahbatu": "Nopol Feeder MIM",
+            "mim_bbt_out": "Feeder MIM Out", "wt_mim_bbt": "WT MIM (Menit)",
+            "driver_kopo": "Driver Feeder Kopo", "nopol_kopo": "Nopol Feeder Kopo",
+            "kopo_out": "Feeder Kopo Out", "wt_kopo": "WT Kopo (Menit)",
+            "driver_jtn": "Driver Feeder Jtn", "nopol_jtn": "Nopol Feeder Jtn",
+            "jtn_out": "Feeder Jtn Out", "wt_jtn": "WT Jtn (Menit)", "keterangan": "Keterangan/Catatan"
+        }
+        df.rename(columns=rename_map, inplace=True)
         
         output = BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Data_Operasional')
+            # 🚀 ARCHITECT FIX: startrow=4 memastikan data Excel ditulis persis mulai Baris 5
+            df.to_excel(writer, index=False, sheet_name='Data_Operasional', startrow=4)
         
         return output.getvalue()
     except Exception as e:
-        st.error(f"Gagal mencetak Excel: {e}")
+        log.error(f"Export Excel Error: {e}")
         return None
