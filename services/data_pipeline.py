@@ -6,7 +6,7 @@ log = logging.getLogger("PIPELINE")
 def proses_kanban_pdp(semua_data: list, waktu_sekarang) -> dict:
     """
     Engine pemroses state Kanban (Pure Data Layer).
-    Terintegrasi dengan SLA dinamis dari Supabase.
+    Terintegrasi dengan SLA dinamis dari Supabase & Auto-Triage Sorting.
     """
     hasil = {
         "portal_kiri": [],
@@ -44,7 +44,6 @@ def proses_kanban_pdp(semua_data: list, waktu_sekarang) -> dict:
         jam_out_kopo = str(row.get('jam_out_kopo', ''))
         jam_out_jtn = str(row.get('jam_out_jtn', ''))
 
-        # 🛡️ ARCHITECT FIX: Menambahkan jam jadwal agar 100% unik dan tidak bertabrakan
         label_armada = f"[{rute}] {nopol} (Jam: {jadwal})"
         pax_details = [] 
         semua_berangkat = False 
@@ -74,7 +73,6 @@ def proses_kanban_pdp(semua_data: list, waktu_sekarang) -> dict:
                 ("JATINANGOR", pax_jtn, jam_out_jtn)
             ]
             
-            # 🚀 AMBIL BATAS SLA DINAMIS DARI DATABASE
             batas_sla = get_sla_limit(rute)
             
             for tj, pax_count, jam_out in rute_map:
@@ -88,13 +86,14 @@ def proses_kanban_pdp(semua_data: list, waktu_sekarang) -> dict:
                             "tujuan": tj,
                             "jumlah": pax_count,
                             "waktu_tunggu": wt,
-                            "is_overdue": wt >= batas_sla # Menggunakan variabel dinamis, bukan hardcode 30
+                            "is_overdue": wt >= batas_sla 
                         })
                         
                         hasil["grup_tujuan"][tj].append({
                             "label": label_armada, 
                             "trip_id": trip_id, 
-                            "jam_tiba": jam_tiba_pdp
+                            "jam_tiba": jam_tiba_pdp,
+                            "pax_count": pax_count # Injeksi data untuk Kalkulator Modal
                         })
                         hasil["total_pax"][tj] += pax_count
             
@@ -113,5 +112,11 @@ def proses_kanban_pdp(semua_data: list, waktu_sekarang) -> dict:
                     "trip_id": trip_id,         
                     "updates": {"status": "SELESAI"}
                 })
+
+    # 🚀 SLA AUTO-TRIAGE: Urutkan monitor_antrean agar armada yang Overdue dipaksa naik ke atas
+    for unit in hasil["monitor_antrean"]:
+        unit['max_wt'] = max([p['waktu_tunggu'] for p in unit['pax_details']]) if unit['pax_details'] else 0
+    
+    hasil["monitor_antrean"].sort(key=lambda x: x['max_wt'], reverse=True)
 
     return hasil
