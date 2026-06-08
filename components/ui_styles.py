@@ -1,234 +1,225 @@
 import streamlit as st
 
-def apply_global_cyberpunk_theme():
-    """Tema Cinematic Enterprise + Adaptive Light/Dark Mode + Safe Compact Mode"""
+def apply_neo_tokyo_corporate():
+    """
+    Tema Neo-Tokyo Corporate: Vision Pro x Bloomberg Terminal.
+    Fokus pada readability, data-density, dan estetika enterprise futuristik.
+    Telah dilengkapi dengan Anti-Light Mode (Mencegah OS bleeding).
+    """
     st.markdown("""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rajdhani:wght@600;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         /* =========================================================
-           🚀 NEXUS PRIME ARCHITECTURE: CSS Variables (Adaptive Theme)
+           CORE ARCHITECTURE: NEO-TOKYO CORPORATE PALETTE
            ========================================================= */
         :root {
-            /* LIGHT MODE (Default - untuk siang hari / layar terang) */
-            --bg-base: #f8fafc;
-            --bg-surface: #ffffff;
-            --border-color: #cbd5e1;
-            --text-primary: #0f172a;
-            --text-muted: #64748b;
-            --accent-cyan: #0284c7;
-            --accent-red: #e11d48;
-            --accent-yellow: #d97706;
-            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-glow-cyan: 0 0 10px rgba(2, 132, 199, 0.15);
-            --btn-hover-bg: rgba(2, 132, 199, 0.05);
-            --expander-bg: #f1f5f9;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                /* DARK MODE (Cyberpunk Enterprise - untuk malam / ruang kontrol) */
-                --bg-base: #0d1117;
-                --bg-surface: #161b22;
-                --border-color: #30363d;
-                --text-primary: #c9d1d9;
-                --text-muted: #8b949e;
-                --accent-cyan: #00d2d3;
-                --accent-red: #ff4d6d;
-                --accent-yellow: #feca57;
-                --shadow-subtle: 0 4px 12px rgba(0, 210, 211, 0.05);
-                --shadow-glow-cyan: 0 0 10px rgba(0, 210, 211, 0.15);
-                --btn-hover-bg: rgba(0, 210, 211, 0.05);
-                --expander-bg: #0d1117;
-            }
+            /* Backgrounds */
+            --nt-bg-main: #0D0E12;         /* Charcoal Black */
+            --nt-bg-sec: rgba(21, 23, 28, 0.65); /* Dark Graphite (Translucent for Glassmorphism) */
+            --nt-bg-solid: #15171C;        /* Dark Graphite (Solid) */
+            
+            /* Accents */
+            --nt-cyan: #00E5FF;            /* Electric Cyan */
+            --nt-cyan-glow: rgba(0, 229, 255, 0.2);
+            --nt-violet: #9D4EDD;          /* Neon Violet */
+            
+            /* Semantic Status */
+            --nt-success: #00E676;         /* Emerald Green */
+            --nt-warning: #FFC400;         /* Amber */
+            --nt-error: #FF1744;           /* Crimson Red */
+            
+            /* Typography & Borders */
+            --nt-text-primary: #F8F9FA;    /* Crisp White */
+            --nt-text-muted: #8B949E;      /* Steel Gray */
+            --nt-border: rgba(255, 255, 255, 0.08); /* Subtle Glass Border */
         }
 
         /* ---------------------------------------------------------
-           GLOBAL INJECTION
+           GLOBAL TYPOGRAPHY & RESET
            --------------------------------------------------------- */
         .stApp { 
-            background-color: var(--bg-base) !important; 
-            color: var(--text-primary) !important; 
-            font-family: 'Inter', sans-serif; 
-            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: var(--nt-bg-main) !important; 
+            color: var(--nt-text-primary) !important; 
+            font-family: 'Inter', sans-serif !important; 
+        }
+        
+        p, span, h1, h2, h3, h4, h5, h6, li, label {
+            color: var(--nt-text-primary) !important;
         }
         
         hr { 
             border: none !important; 
-            border-top: 1px dashed var(--border-color) !important; 
-            margin: 1rem 0 !important; 
-        }
-        
-        div[data-testid="metric-container"] { padding-bottom: 0.5rem !important; }
-
-        .block-container {
-            padding-top: 2rem !important;
-            padding-bottom: 2rem !important;
+            border-top: 1px solid var(--nt-border) !important; 
+            margin: 1.5rem 0 !important; 
         }
 
         /* ---------------------------------------------------------
-           FORM & INPUTS (Crisp Minimalist + Glass-like UI)
+           PREMIUM GLASSMORPHISM CONTAINERS
            --------------------------------------------------------- */
-        div[data-baseweb="input"] > div, div[data-baseweb="select"] > div, div[data-baseweb="number"] > div { 
-            background-color: var(--bg-surface) !important; 
-            border: 1px solid var(--border-color) !important; 
-            border-radius: 6px !important; 
-            color: var(--text-primary) !important; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            background: var(--nt-bg-sec) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--nt-border) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+            padding: 12px !important;
+            transition: all 0.3s ease !important;
         }
-        div[data-baseweb="input"] > div:focus-within, div[data-baseweb="select"] > div:focus-within { 
-            border-color: var(--accent-cyan) !important; 
-            box-shadow: 0 0 0 1px var(--accent-cyan) !important; 
+
+        [data-testid="stVerticalBlockBorderWrapper"]:hover {
+            border-color: var(--nt-cyan-glow) !important;
+            box-shadow: 0 0 15px var(--nt-cyan-glow) !important;
+        }
+
+        /* ---------------------------------------------------------
+           DATA-FIRST METRICS (KPI CARDS)
+           --------------------------------------------------------- */
+        div[data-testid="stMetricValue"] {
+            font-size: 2.4rem !important;
+            font-weight: 800 !important;
+            color: var(--nt-text-primary) !important;
+            letter-spacing: -1px !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
         }
         
-        label { 
-            color: var(--text-muted) !important; 
+        div[data-testid="stMetricLabel"] {
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+            color: var(--nt-text-muted) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1.5px !important;
+        }
+
+        /* ---------------------------------------------------------
+           FUTURISTIC BUTTONS
+           --------------------------------------------------------- */
+        div.stButton > button {
+            background-color: var(--nt-bg-solid) !important; 
+            color: var(--nt-text-primary) !important; 
+            border: 1px solid var(--nt-border) !important; 
+            border-radius: 6px !important; 
             font-weight: 600 !important; 
-            margin-bottom: 4px !important; 
             font-size: 13px !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease !important;
+        }
+        
+        div.stButton > button:hover {
+            border-color: var(--nt-cyan) !important;
+            color: var(--nt-cyan) !important;
+            box-shadow: 0 0 10px var(--nt-cyan-glow) !important;
+            transform: translateY(-1px);
+        }
+
+        div.stButton > button[kind="primary"] {
+            background-color: transparent !important;
+            color: var(--nt-cyan) !important;
+            border: 1px solid var(--nt-cyan) !important;
+            box-shadow: inset 0 0 10px var(--nt-cyan-glow) !important;
+        }
+        
+        div.stButton > button[kind="primary"]:hover {
+            background-color: var(--nt-cyan) !important;
+            color: var(--nt-bg-main) !important;
+            box-shadow: 0 0 15px var(--nt-cyan-glow) !important;
+        }
+
+        /* ---------------------------------------------------------
+           MODAL DIALOG FIX
+           --------------------------------------------------------- */
+        div[data-testid="stDialog"] > div[role="dialog"] {
+            background: var(--nt-bg-solid) !important;
+            border: 1px solid var(--nt-border) !important;
+            border-top: 3px solid var(--nt-cyan) !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8) !important;
+            border-radius: 8px !important;
+        }
+
+        /* ---------------------------------------------------------
+           UTILITY TYPOGRAPHY CLASSES
+           --------------------------------------------------------- */
+        .nt-nopol {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--nt-text-primary);
+        }
+        
+        .nt-meta {
+            font-size: 12px;
+            color: var(--nt-text-muted);
+            font-weight: 600;
             letter-spacing: 0.5px;
         }
 
-        /* ---------------------------------------------------------
-           MAIN BUTTONS (Elegant Ghost Button)
-           --------------------------------------------------------- */
-        div.stButton > button:first-child, div[data-testid="stFormSubmitButton"] > button {
-            background-color: transparent !important; 
-            color: var(--text-primary) !important; 
-            border: 1px solid var(--border-color) !important; 
-            border-radius: 6px !important; 
-            font-family: 'Rajdhani', sans-serif !important;
-            font-size: 16px !important;
-            font-weight: 700 !important; 
-            letter-spacing: 1px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            width: 100% !important;
+        .nt-badge-success { color: var(--nt-success); font-weight: 700; }
+        .nt-badge-warning { color: var(--nt-warning); font-weight: 700; }
+        .nt-badge-error { color: var(--nt-error); font-weight: 800; text-shadow: 0 0 8px rgba(255, 23, 68, 0.4); }
+
+        /* =========================================================
+           ANTI-LIGHT MODE OVERRIDES (CRITICAL FIX)
+           ========================================================= */
+        
+        /* 1. PAKSA SIDEBAR MENJADI GELAP */
+        [data-testid="stSidebar"] {
+            background-color: var(--nt-bg-main, #0D0E12) !important;
+            border-right: 1px solid var(--nt-border, rgba(255,255,255,0.08)) !important;
         }
-        div.stButton > button:first-child:hover, div[data-testid="stFormSubmitButton"] > button:hover {
-            border-color: var(--accent-cyan) !important; 
-            color: var(--accent-cyan) !important;
-            background-color: var(--btn-hover-bg) !important;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow-cyan);
+        
+        /* 2. PAKSA BACKGROUND INPUT, DROPDOWN, NUMBER INPUT MENJADI GELAP */
+        div[data-baseweb="input"] > div,
+        div[data-baseweb="select"] > div,
+        div[data-baseweb="number"] > div {
+            background-color: var(--nt-bg-solid, #15171C) !important;
+            border: 1px solid var(--nt-border, rgba(255,255,255,0.08)) !important;
         }
 
-        /* ---------------------------------------------------------
-           SPECIFIC BUTTONS (Logout & Sync) - Reliable Selection
-           --------------------------------------------------------- */
-        .btn-logout div[data-testid="stButton"] button, .btn-sync div[data-testid="stButton"] button { 
-            border-color: var(--border-color) !important; 
-            color: var(--text-muted) !important; 
-            font-size: 13px !important; 
-            padding: 4px 12px !important; 
-            background: var(--bg-surface) !important;
-            transition: all 0.2s ease-in-out !important;
-        }
-        .btn-logout div[data-testid="stButton"] button:hover { 
-            border-color: var(--accent-red) !important; 
-            color: var(--accent-red) !important; 
-            background-color: rgba(225, 29, 72, 0.05) !important; 
-            transform: scale(0.98); /* Tactile press effect */
-            box-shadow: 0 0 10px rgba(225, 29, 72, 0.15) !important; 
-        }
-        .btn-sync div[data-testid="stButton"] button:hover { 
-            border-color: var(--accent-yellow) !important; 
-            color: var(--accent-yellow) !important; 
-            background-color: rgba(217, 119, 6, 0.05) !important; 
-            transform: scale(0.98);
-            box-shadow: 0 0 10px rgba(217, 119, 6, 0.15) !important; 
+        /* 3. PAKSA TEKS DALAM INPUT MENJADI PUTIH */
+        div[data-baseweb="input"] input,
+        div[data-baseweb="select"] div[aria-selected="true"],
+        div[data-baseweb="select"] span {
+            color: var(--nt-text-primary, #F8F9FA) !important;
+            -webkit-text-fill-color: var(--nt-text-primary, #F8F9FA) !important;
         }
 
-        /* ---------------------------------------------------------
-           BADGES & ALARMS
-           --------------------------------------------------------- */
-        .badge-overdue { 
-            background-color: rgba(225, 29, 72, 0.1); 
-            color: var(--accent-red); 
-            border: 1px solid rgba(225, 29, 72, 0.5); 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            font-size: 11px; 
-            font-weight: 700; 
-            display: inline-block; 
-            margin-top: 5px; 
+        /* 4. PAKSA LIST DROPDOWN (POPOVER/OPTIONS) MENJADI GELAP */
+        div[data-baseweb="popover"] > div,
+        ul[role="listbox"],
+        ul[role="listbox"] li {
+            background-color: var(--nt-bg-solid, #15171C) !important;
+            color: var(--nt-text-primary, #F8F9FA) !important;
         }
-        .badge-normal { 
-            background-color: var(--bg-surface); 
-            color: var(--text-muted); 
-            border: 1px solid var(--border-color); 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            font-size: 11px; 
-            font-weight: 600; 
-            display: inline-block; 
-            margin-top: 5px; 
+        
+        ul[role="listbox"] li:hover {
+            background-color: rgba(0, 229, 255, 0.1) !important; /* Efek hover cyan */
+            color: var(--nt-cyan, #00E5FF) !important;
         }
-
-        /* ---------------------------------------------------------
-           EXPANDER UI (Premium Box)
-           --------------------------------------------------------- */
-        div[data-testid="stExpander"] { 
-            background-color: var(--expander-bg); 
-            border: 1px solid var(--border-color); 
-            border-radius: 6px; 
-            transition: all 0.3s ease;
+        
+        /* 5. FIX CHECKBOX & TEXT AREA (OPSIONAL) */
+        textarea {
+            background-color: var(--nt-bg-solid, #15171C) !important;
+            color: var(--nt-text-primary, #F8F9FA) !important;
+            border: 1px solid var(--nt-border, rgba(255,255,255,0.08)) !important;
         }
-        div[data-testid="stExpander"] summary { 
-            color: var(--text-muted) !important; 
-            font-family: 'Inter', sans-serif !important; 
-            font-size: 13px !important; 
-            font-weight: 600 !important;
-            letter-spacing: 0.5px !important; 
-            transition: color 0.2s ease !important;
-        }
-        div[data-testid="stExpander"] summary:hover {
-            color: var(--text-primary) !important;
+        div[data-testid="stCheckbox"] label span {
+            color: var(--nt-text-primary) !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
-def render_cyberpunk_header(title, subtitle, color_hex="#00d2d3", align="center"):
-    """Render Judul dengan Cinematic Depth adaptif untuk Light/Dark Mode"""
-    
-    # Mapping pintar untuk mengamankan warna neon jika sedang di light mode agar tetap terlihat berkelas
-    color_map = {
-        "#0284c7": "var(--accent-cyan)", 
-        "#dc2626": "var(--accent-red)", 
-        "#d97706": "var(--accent-yellow)", 
-        "#00e5ff": "var(--accent-cyan)", 
-        "#ff2a2a": "var(--accent-red)", 
-        "#ffc107": "var(--accent-yellow)", 
-        "#ff0055": "var(--accent-red)"
-    }
-    
-    # Gunakan mapping jika ada, atau fallback ke color_hex input
-    adaptive_color = color_map.get(color_hex.lower(), color_hex)
+
+def render_neo_tokyo_header(title, subtitle, accent="var(--nt-cyan)", align="left"):
     align_style = "text-align: center;" if align == "center" else "text-align: left;"
-    
     st.markdown(f"""
-        <div style='{align_style} width: 100%; margin-bottom: 20px;'> 
-            <h1 style='
-                color: var(--text-primary); 
-                font-family: "Rajdhani", sans-serif; 
-                font-size: 34px; 
-                font-weight: 700; 
-                margin-top: 0px; 
-                margin-bottom: 0px; 
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-                border-bottom: 3px solid {adaptive_color};
-                display: inline-block;
-                padding-bottom: 6px;
-            '>{title}</h1>
-            <p style='
-                color: var(--text-muted); 
-                font-family: "Inter", sans-serif; 
-                font-size: 14px; 
-                margin-top: 8px; 
-                letter-spacing: 1px; 
-                font-weight: 500;
-            '>{subtitle}</p>
+        <div style='{align_style} width: 100%; margin-bottom: 24px; border-bottom: 1px solid var(--nt-border); padding-bottom: 16px;'> 
+            <h1 style='color: var(--nt-text-primary) !important; font-size: 26px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 1px;'>
+                <span style='color: {accent};'>|</span> {title}
+            </h1>
+            <p style='color: var(--nt-text-muted) !important; font-size: 12px; margin-top: 6px; margin-left: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;'>
+                {subtitle}
+            </p>
         </div>
     """, unsafe_allow_html=True)
