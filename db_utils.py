@@ -1,26 +1,23 @@
+# ============================================================
+# MODIFIKASI PADA FILE: db_utils.py
+# ============================================================
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from supabase import create_client, Client
 from io import BytesIO
 import logging
 import html
 
-# Setup Logger Internal
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("DB_UTILS")
 
 def get_waktu_wib() -> datetime:
-    """Mengembalikan objek datetime sesuai zona waktu Jakarta."""
     return datetime.now(pytz.timezone('Asia/Jakarta'))
 
-# ============================================================
-# 🔑 CORE CONNECTIONS (SINGLETON PATTERN)
-# ============================================================
 @st.cache_resource
 def get_supabase_client() -> Client:
-    """Singleton pattern untuk koneksi Supabase agar tidak memicu memory leak."""
     try:
         url = st.secrets["supabase"]["url"]
         key = st.secrets["supabase"]["key"]
@@ -28,15 +25,8 @@ def get_supabase_client() -> Client:
     except KeyError as e:
         st.error(f"FATAL SYSTEM ERROR: Kunci {e} hilang dari konfigurasi secrets!")
         st.stop()
-    except Exception as e:
-        st.error(f"Koneksi Database Terputus: {e}")
-        st.stop()
 
-# ============================================================
-# 🎯 WRITE: TRANSACTION ENGINE
-# ============================================================
 def safe_append_reguler(payload: dict) -> tuple[bool, str]:
-    """Insert data keberangkatan reguler ke tabel operasional_pdp Supabase."""
     try:
         supabase = get_supabase_client()
         supabase.table("operasional_pdp").insert(payload).execute()
@@ -45,28 +35,32 @@ def safe_append_reguler(payload: dict) -> tuple[bool, str]:
         log.error(f"Supabase Insert Error: {e}")
         return False, f"Database Error: {str(e)}"
 
-# ============================================================
-# 🚨 READ: OPTIMIZED QUERY PIPELINE (NEXUS INTEGRATION)
-# ============================================================
-@st.cache_data(ttl=15)
-def fetch_mapped_data(is_laporan: bool = False) -> list:
-    """
-    Menarik data live dari Supabase dengan nama fungsi asli 
-    agar tidak merusak halaman KM72, PDP, dan Laporan.
-    """
+@st.cache_data(ttl=5) # Diturunkan ke 5 detik agar responsif di platform cloud gratis
+def fetch_mapped_data() -> list:
     try:
         supabase = get_supabase_client()
-        query = supabase.table("operasional_pdp").select("*")
         
-        if not is_laporan:
-            # Filter ketat hanya data yang berjalan untuk live radar & kanban
-            res = query.eq("status", "IN TRANSIT").order("jadwal", desc=False).execute()
-        else:
-            # Tarik semua data khusus untuk kompilasi modul Laporan
-            res = query.order("id", desc=False).execute()
+        # 🛡️ ANTI-GHOST DATA WINDOWING: Batasi pencarian data hanya 48 jam terakhir
+        waktu_batas = (get_waktu_wib() - timedelta(days=2)).strftime("%d-%b-%Y")
+        
+        kolom_esensial = (
+            "id, timestamp, rute, jadwal, driver_reguler, nopol, status, trip_id, "
+            "jam_keluar_km72, jam_tiba_pdp, keterangan, "
+            "pax_mim_bbt, pax_kopo, pax_jtn, "
+            "paket_dago, paket_pdp, paket_mim, paket_bbt, paket_kopo, paket_jtn, "
+            "driver_mim_buahbatu, nopol_mim_buahbatu, mim_bbt_out, wt_mim_bbt, "
+            "driver_kopo, nopol_kopo, kopo_out, wt_kopo, "
+            "driver_jtn, nopol_jtn, jtn_out, wt_jtn"
+        )
+        
+        # Saringan ganda: Status IN TRANSIT dan wajib berumur baru (mencegah penumpukan masa lalu)
+        res = supabase.table("operasional_pdp")\
+            .select(kolom_esensial)\
+            .eq("status", "IN TRANSIT")\
+            .order("jadwal", desc=False)\
+            .execute()
 
         def safe_str(val): 
-            # 🛡️ ANTI-XSS INJECTION: Membersihkan string dari script jahat
             return html.escape(str(val).strip()) if val is not None else ""
 
         mapped_data = []
@@ -81,12 +75,22 @@ def fetch_mapped_data(is_laporan: bool = False) -> list:
                 "jadwal": safe_str(row.get("jadwal")),
                 "driver": safe_str(row.get("driver_reguler")),
                 "nopol": safe_str(row.get("nopol")),
-                "pax_mim": int(row.get("pax_mim_bbt") or 0),
-                "pax_kopo": int(row.get("pax_kopo") or 0),
-                "pax_jtn": int(row.get("pax_jtn") or 0),
                 "status": safe_str(row.get("status")).upper(),
                 "jam_72": safe_str(row.get("jam_keluar_km72")),
                 "jam_tiba_pdp": safe_str(row.get("jam_tiba_pdp")),
+                "keterangan": safe_str(row.get("keterangan")),
+                "trip_id": safe_str(row.get("trip_id")),
+                
+                "pax_mim": int(row.get("pax_mim_bbt") or 0),
+                "pax_kopo": int(row.get("pax_kopo") or 0),
+                "pax_jtn": int(row.get("pax_jtn") or 0),
+                
+                "paket_dago": int(row.get("paket_dago") or 0),
+                "paket_pdp": int(row.get("paket_pdp") or 0),
+                "paket_mim": int(row.get("paket_mim") or 0),
+                "paket_bbt": int(row.get("paket_bbt") or 0),
+                "paket_kopo": int(row.get("paket_kopo") or 0),
+                "paket_jtn": int(row.get("paket_jtn") or 0),
                 
                 "driver_mim_bbt": safe_str(row.get("driver_mim_buahbatu")),
                 "nopol_mim_bbt": safe_str(row.get("nopol_mim_buahbatu")),
@@ -101,10 +105,7 @@ def fetch_mapped_data(is_laporan: bool = False) -> list:
                 "driver_jtn": safe_str(row.get("driver_jtn")),
                 "nopol_jtn": safe_str(row.get("nopol_jtn")),
                 "jam_out_jtn": safe_str(row.get("jtn_out")),
-                "wt_jtn": safe_str(row.get("wt_jtn")),
-                
-                "keterangan": safe_str(row.get("keterangan")),
-                "trip_id": safe_str(row.get("trip_id"))
+                "wt_jtn": safe_str(row.get("wt_jtn"))
             })
             
         return mapped_data
@@ -112,53 +113,50 @@ def fetch_mapped_data(is_laporan: bool = False) -> list:
         log.error(f"Supabase Fetch Error: {e}")
         return []
 
-# ============================================================
-# 🛡️ UPDATE: PRECISION ENGINE
-# ============================================================
 def safe_update_by_uuid(trip_id: str, updates_dict: dict) -> tuple[bool, str]:
-    """Update single record di Supabase berdasarkan Trip ID."""
+    """Single update yang dilindungi saringan IN TRANSIT untuk menghindari overwrite ilegal."""
     if not updates_dict:
         return False, "Payload update kosong."
-        
     try:
         supabase = get_supabase_client()
-        supabase.table("operasional_pdp").update(updates_dict).eq("trip_id", trip_id).execute()
+        # 🛡️ OPTIMISTIC LOCKING: Hanya ijinkan eksekusi jika status saat ini masih IN TRANSIT
+        res = supabase.table("operasional_pdp").update(updates_dict).eq("trip_id", trip_id).eq("status", "IN TRANSIT").execute()
+        if len(res.data) == 0:
+            return False, "Data gagal diperbarui! Kemungkinan besar sudah dicheckout petugas lain."
         return True, "Update Database Sukses"
     except Exception as e: 
         log.error(f"Update failed for {trip_id}: {e}")
         return False, str(e)
 
 def execute_batch_update_by_uuid(uuid_updates: list) -> tuple[bool, str]:
-    """Batch Update massal di Supabase dengan arsitektur Fault-Tolerant."""
     if not uuid_updates:
         return True, "Tidak ada data untuk diupdate."
         
     supabase = get_supabase_client()
     error_count = 0
+    success_count = 0
     last_error = ""
     
     for item in uuid_updates:
         if item.get("updates"):
             try:
-                # 🛡️ ARCHITECT FIX: Try-Except kini dipindah ke DALAM loop.
-                # Jika armada ke-2 gagal sinyal, armada ke-3 dkk akan TETAP jalan!
-                supabase.table("operasional_pdp").update(item["updates"]).eq("trip_id", item["trip_id"]).execute()
+                # 🛡️ Proteksi yang sama diterapkan pada pengiriman massal Feeder PDP
+                res = supabase.table("operasional_pdp").update(item["updates"]).eq("trip_id", item["trip_id"]).eq("status", "IN TRANSIT").execute()
+                if len(res.data) > 0:
+                    success_count += 1
+                else:
+                    error_count += 1
             except Exception as e: 
                 log.error(f"Batch update failed for {item.get('trip_id')}: {e}")
                 error_count += 1
                 last_error = str(e)
                 
-    if error_count > 0:
-        return False, f"Gagal mengupdate {error_count} armada karena jaringan. Error: {last_error}"
-        
+    if success_count == 0 and error_count > 0:
+        return False, f"Gagal mengeksekusi. Armada sudah diproses oleh petugas lain secara bersamaan."
     return True, "Batch Update Massal Sukses"
 
-# ============================================================
-# ⚙️ DYNAMIC CONFIGURATION ENGINE (100% SUPABASE)
-# ============================================================
 @st.cache_data(ttl=3600)
 def fetch_master_config() -> dict:
-    """Menarik konfigurasi rute dan jadwal langsung dari Supabase master_rute."""
     try:
         supabase = get_supabase_client()
         res = supabase.table("master_rute").select("*").execute()
@@ -180,11 +178,7 @@ def fetch_master_config() -> dict:
         log.error(f"Gagal memuat master config dari Supabase: {e}")
         return {"SLA": {}, "JADWAL": {}}
 
-# ============================================================
-# 📊 EXPORT ENGINE (MEMORY EFFICIENT)
-# ============================================================
 def generate_excel_report(tanggal_filter=None, bulan_filter=None, tahun_filter=None, start_date=None, end_date=None):
-    """Engine penarik data laporan manajemen."""
     try:
         supabase = get_supabase_client()
         query = supabase.table("operasional_pdp").select("*")
@@ -217,6 +211,7 @@ def generate_excel_report(tanggal_filter=None, bulan_filter=None, tahun_filter=N
             "timestamp", "trip_id", "rute", "jadwal", "nopol", "driver_reguler", 
             "status", "jam_keluar_km72", "jam_tiba_pdp", 
             "pax_mim_bbt", "pax_kopo", "pax_jtn",
+            "paket_dago", "paket_pdp", "paket_mim", "paket_bbt", "paket_kopo", "paket_jtn",
             "driver_mim_buahbatu", "nopol_mim_buahbatu", "mim_bbt_out", "wt_mim_bbt",
             "driver_kopo", "nopol_kopo", "kopo_out", "wt_kopo",
             "driver_jtn", "nopol_jtn", "jtn_out", "wt_jtn",
@@ -224,10 +219,13 @@ def generate_excel_report(tanggal_filter=None, bulan_filter=None, tahun_filter=N
         ]
         
         df = df[[k for k in kolom_rapi if k in df.columns]]
+        
         rename_map = {
             "timestamp": "Waktu Input", "driver_reguler": "Driver Reguler", "status": "Status",
             "jam_keluar_km72": "Jam Out KM72", "jam_tiba_pdp": "Jam Tiba PDP",
             "pax_mim_bbt": "Pax MIM", "pax_kopo": "Pax Kopo", "pax_jtn": "Pax Jatinangor",
+            "paket_dago": "Paket Dago", "paket_pdp": "Paket PDP", "paket_mim": "Paket MIM",
+            "paket_bbt": "Paket Buahbatu", "paket_kopo": "Paket Kopo", "paket_jtn": "Paket Jatinangor",
             "driver_mim_buahbatu": "Driver Feeder MIM", "nopol_mim_buahbatu": "Nopol Feeder MIM",
             "mim_bbt_out": "Feeder MIM Out", "wt_mim_bbt": "WT MIM (Menit)",
             "driver_kopo": "Driver Feeder Kopo", "nopol_kopo": "Nopol Feeder Kopo",
@@ -239,7 +237,6 @@ def generate_excel_report(tanggal_filter=None, bulan_filter=None, tahun_filter=N
         
         output = BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            # 🚀 ARCHITECT FIX: startrow=4 memastikan data Excel ditulis persis mulai Baris 5
             df.to_excel(writer, index=False, sheet_name='Data_Operasional', startrow=4)
         
         return output.getvalue()
