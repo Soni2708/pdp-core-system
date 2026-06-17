@@ -1,4 +1,5 @@
 import streamlit as st
+import base64
 
 def apply_neo_tokyo_corporate():
     """
@@ -207,9 +208,17 @@ def apply_neo_tokyo_corporate():
         div[data-testid="stCheckbox"] label span {
             color: var(--nt-text-primary) !important;
         }
+
+        /* ---------------------------------------------------------
+           DYNAMIC STATE CLASSES (OVERDUE ALERTS)
+           --------------------------------------------------------- */
+        [data-testid="stVerticalBlockBorderWrapper"]:has(.overdue-flag) {
+            background: rgba(255, 23, 68, 0.05) !important;
+            border-color: rgba(255, 23, 68, 0.4) !important;
+            box-shadow: 0 0 15px rgba(255, 23, 68, 0.2) !important;
+        }
         </style>
     """, unsafe_allow_html=True)
-
 
 def render_neo_tokyo_header(title, subtitle, accent="var(--nt-cyan)", align="left"):
     align_style = "text-align: center;" if align == "center" else "text-align: left;"
@@ -223,3 +232,26 @@ def render_neo_tokyo_header(title, subtitle, accent="var(--nt-cyan)", align="lef
             </p>
         </div>
     """, unsafe_allow_html=True)
+
+@st.cache_data
+def get_base64_image(image_path: str) -> str:
+    """Membaca file gambar dari disk dan menyimpannya di cache RAM server."""
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except FileNotFoundError:
+        return ""
+
+def render_logo(align="center", max_width="140px", margin_bottom="15px", padding_top="10px"):
+    """
+    Render logo perusahaan secara dinamis.
+    Mendukung pengaturan posisi (center/left) dan ukuran per halaman.
+    """
+    img_b64 = get_base64_image("assets/logo.png")
+    if img_b64:
+        justify = "center" if align == "center" else "flex-start"
+        st.markdown(f"""
+            <div style='display: flex; justify-content: {justify}; align-items: center; margin-bottom: {margin_bottom}; width: 100%; padding-top: {padding_top};'>
+                <img src='data:image/png;base64,{img_b64}' style='max-width: {max_width}; height: auto; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));'>
+            </div>
+        """, unsafe_allow_html=True)
