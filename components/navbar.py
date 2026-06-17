@@ -3,51 +3,27 @@ from core.auth import logout_user
 
 def render_navbar(active_module: str):
     """
-    Render sidebar navigasi Neo-Tokyo Corporate.
-    Zero-emoji, fokus pada tipografi dan indikator aktif.
+    Komponen Navigasi Utama & Tombol Logout (Neo-Tokyo Style)
     """
-    with st.sidebar:
-        try:
-            st.image("assets/logo.png", width=140)
-        except:
-            st.markdown("<h2 style='color: var(--nt-text-primary); font-weight: 800; letter-spacing: 1px;'>LINTAS HUB</h2>", unsafe_allow_html=True)
+    # Menggunakan container agar rapi dan terisolasi
+    with st.container():
+        # Garis pembatas atas opsional
+        # st.markdown("<div style='border-bottom: 1px solid var(--nt-border); padding-top: 10px;'></div>", unsafe_allow_html=True)
         
-        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+        col_nav, col_space, col_logout = st.columns([3, 2, 1], vertical_alignment="center")
         
-        petugas_key = f"petugas_{active_module}"
-        if petugas_key in st.session_state and st.session_state[petugas_key]:
-            st.markdown(f"<div class='nt-meta' style='letter-spacing: 1.5px;'>USER ACTIVE</div><div style='color: var(--nt-cyan); font-weight: 800; font-size: 15px; letter-spacing: 1px;'>{st.session_state[petugas_key].upper()}</div>", unsafe_allow_html=True)
-        else:
-            st.markdown("<div class='nt-meta' style='letter-spacing: 1.5px;'>USER ACTIVE</div><div style='color: var(--nt-cyan); font-weight: 800; font-size: 15px; letter-spacing: 1px;'>GUEST_SYSTEM</div>", unsafe_allow_html=True)
-        
-        st.divider()
-        
-        # Daftar halaman korporat
-        pages = {
-            "HOME DASHBOARD": ("0_Home.py", "home"),
-            "PORTAL LINTAS": ("pages/1_Portal_Lintas.py", "portal"),
-            "CHECKPOINT KM72": ("pages/2_Checkpoint_KM72.py", "km72"),
-            "PASTEUR DROP POINT": ("pages/3_Pasteur_Drop_Point.py", "pdp"),
-            "DATA & LAPORAN": ("pages/4_Laporan.py", "admin")
-        }
-        
-        st.markdown("<div class='nt-meta' style='margin-bottom: 12px; letter-spacing: 1px;'>SYSTEM MODULES</div>", unsafe_allow_html=True)
-        
-        for label, (path, module) in pages.items():
-            is_active = (active_module == module)
-            if is_active:
-                # Modul aktif diberikan garis pinggir menyala
-                st.markdown(f"<div style='border-left: 3px solid var(--nt-cyan); padding-left: 10px; margin-bottom: 12px;'><b style='color: var(--nt-text-primary); letter-spacing: 1px; font-size: 14px;'>{label}</b></div>", unsafe_allow_html=True)
-            else:
-                st.page_link(path, label=label)
-        
-        st.divider()
-        
-        if st.button("TERMINATE SESSION", use_container_width=True):
-            if active_module == "home":
-                for key in list(st.session_state.keys()):
-                    if key.startswith("akses_") or key.startswith("petugas_"):
-                        del st.session_state[key]
-                st.rerun()
-            else:
+        with col_nav:
+            # Indikator Modul Aktif
+            st.markdown(f"""
+            <div style='font-size: 12px; font-weight: 700; color: var(--nt-text-muted); letter-spacing: 1px;'>
+                SYSTEM / <span style='color: var(--nt-cyan);'>{active_module.upper()}</span>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col_logout:
+            # Tombol Logout (Menggunakan type secondary agar tidak bentrok dengan tombol Transmit)
+            if st.button("LOGOUT", key=f"btn_logout_{active_module}", use_container_width=True):
                 logout_user(active_module)
+                
+        # Garis pembatas bawah
+        st.markdown("<div style='border-bottom: 1px solid var(--nt-border); margin-bottom: 15px; margin-top: 5px;'></div>", unsafe_allow_html=True)
