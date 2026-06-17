@@ -1,7 +1,8 @@
-streamlit
-pandas
-supabase
-pytz
-openpyxl
-bcrypt
-streamlit-cookies-controller
+streamlit>=1.32.0
+pytz>=2023.3
+supabase>=2.3.0
+pandas>=2.0.0
+openpyxl>=3.1.2
+bcrypt>=4.0.1
+argon2-cffi>=21.3.0
+streamlit-cookies-controller>=1.0.0  # Opsional, akan fallback jika tidak ada
