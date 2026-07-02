@@ -89,7 +89,7 @@ col_judul, col_status = st.columns([3, 1.5])
 with col_judul:
     render_neo_tokyo_header(
         title="CHECKPOINT KM72", 
-        subtitle="Sistem Pemantauan Radar Perjalanan Armada", 
+        subtitle="Sistem Pemantauan Checkpoint KM72", 
         accent="var(--nt-cyan)",
         align="left"
     )
